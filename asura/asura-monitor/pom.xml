@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.asura</groupId>
+		<artifactId>asura</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	<artifactId>asura-monitor</artifactId>
+	<version>${version}</version>
+	<name>asura-monitor</name>
+	<description>监控</description>
+
+
+	<properties>
+		<version>0.0.1</version>
+	</properties>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>com.asura</groupId>
+			<artifactId>com-asura-framework-base</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dubbo</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.github.sgroschupf</groupId>
+			<artifactId>zkclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jmx</groupId>
+			<artifactId>jmx</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jmx</groupId>
+			<artifactId>jmxremote</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jmx</groupId>
+			<artifactId>jmxremote_optional</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+									<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								</manifest>
+							</archive>
+							<finalName>com-asura-framework-monitor-center-${version}</finalName>
+							<includes>
+								<include>**/annotation/**/*.class</include>
+								<include>**/entity/**/*.class</include>
+								<include>**/jmx/mbean/**/*.class</include>
+								<include>**/jmx/client/**/*.class</include>
+								<include>**/listener/**/*.class</include>
+								<include>**/springinit/**/InitMonitorSide.class</include>
+								<include>**/zkclient/Monitor*.class</include>
+								<include>**/remotefile/**/RemoteFileClient.class</include>
+								<include>META-INF/spring/springMonitorCenter.xml</include>
+							</includes>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>client</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+									<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								</manifest>
+							</archive>
+							<finalName>com-asura-framework-monitor-client-${version}</finalName>
+							<includes>
+								<include>**/annotation/**/*.class</include>
+								<include>**/entity/**/*.class</include>
+								<include>**/jmx/mbean/**/*.class</include>
+								<include>**/jmx/server/**/*.class</include>
+								<include>**/listener/**/*.class</include>
+								<include>**/springinit/**/InitApplicationSide.class</include>
+								<include>**/springinit/**/InitJmxServer.class</include>
+								<include>**/zkclient/Application*.class</include>
+								<include>**/remotefile/**/RemoteFileServer.class</include>
+								<include>META-INF/spring/springMonitorClient.xml</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
