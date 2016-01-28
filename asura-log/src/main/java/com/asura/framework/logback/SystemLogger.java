@@ -55,7 +55,7 @@ public class SystemLogger {
 	public Object doBasicProfiling(final ProceedingJoinPoint joinPoint) throws Throwable {
 		long start_all = System.currentTimeMillis();
 		long end_all = 0L;
-		Transaction tran = Cat.newTransaction("Aspect-proxy", "proxy-method");
+		Transaction tran = Cat.newTransaction("Aspect-proxy", joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
 		if (RpcContext.getContext().getRemoteAddressString() != null && RpcContext.getContext().getMethodName() != null
 				&& RpcContext.getContext().getUrl() != null) {
 			MDC.put(HOST, RpcContext.getContext().getRemoteAddressString());
