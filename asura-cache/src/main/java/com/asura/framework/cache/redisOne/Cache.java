@@ -39,7 +39,7 @@ public @interface Cache {
 
 	int expireTime() default 3600;
 
-	boolean selfControl() default false; // true缓存的使用不受外部空值
+	boolean selfControl() default false; // true缓存的使用不受外部控制
 	
 	boolean isUpdate() default false; // true 更新缓存中的数据
 
