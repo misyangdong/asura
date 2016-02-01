@@ -112,6 +112,10 @@ public class CacheAspect {
 	/**
 	 * 
 	 * 定义String结构的缓存逻辑
+	 * 使用例子：
+	 * =====@Cache(dataStructure = DataStructure.string, key = "#viewnum")
+	 *      public String aaa(String viewnum){.....}
+	 *  
 	 *
 	 * @author zhangshaobin
 	 * @created 2014年11月30日 上午2:51:11
@@ -150,6 +154,9 @@ public class CacheAspect {
 	/**
 	 * 
 	 * 定义hash结构的缓存逻辑
+	 * 使用例子：
+	 * =====@Cache(dataStructure = DataStructure.hash, key = "viewnum", fieldKey = "#id")
+	 *      public xxx aaa(String id) {...}
 	 *
 	 * @author zhangshaobin
 	 * @created 2014年11月30日 上午2:51:11
