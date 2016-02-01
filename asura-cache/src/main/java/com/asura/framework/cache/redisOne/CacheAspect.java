@@ -9,9 +9,12 @@
  */
 package com.asura.framework.cache.redisOne;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -25,6 +28,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.conf.subscribe.ConfigSubscriber;
 
 /**
@@ -43,7 +47,7 @@ import com.asura.framework.conf.subscribe.ConfigSubscriber;
 @Component
 @Aspect
 public class CacheAspect {
-
+	
 	@Resource(name = "redisOperations")
 	private RedisOperations redisOperations;
 
@@ -113,7 +117,7 @@ public class CacheAspect {
 	 * 
 	 * 定义String结构的缓存逻辑
 	 * 使用例子：
-	 * =====@Cache(dataStructure = DataStructure.string, key = "#viewnum")
+	 * =====@Cache(dataStructure = DataStructure.string, key = "#viewnum", expireTime = 864000)
 	 *      public String aaa(String viewnum){.....}
 	 *  
 	 *
@@ -155,8 +159,13 @@ public class CacheAspect {
 	 * 
 	 * 定义hash结构的缓存逻辑
 	 * 使用例子：
-	 * =====@Cache(dataStructure = DataStructure.hash, key = "viewnum", fieldKey = "#id")
+	 * 单个字段作为fieldKey
+	 * =====@Cache(dataStructure = DataStructure.hash, key = "viewnum", fieldKey = "#id", expireTime = 864000)
 	 *      public xxx aaa(String id) {...}
+	 * 
+	 * 多个字段作为fieldKey
+	 * =====@Cache(dataStructure = DataStructure.hash, key = "viewnum", fieldKey = "entity:fid,fcode", expireTime = 864000)
+	 *      public xxx bbb(EmployeeEntity entity) {...}
 	 *
 	 * @author zhangshaobin
 	 * @created 2014年11月30日 上午2:51:11
@@ -383,6 +392,7 @@ public class CacheAspect {
 	 * @return
 	 */
 	private String parseKey(String key, Method method, Object[] args) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		//获取被拦截方法参数名列表(使用Spring支持类库)
 		LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
 		String[] paraNameArr = u.getParameterNames(method);
@@ -393,7 +403,42 @@ public class CacheAspect {
 		//把方法参数放入SPEL上下文中
 		for (int i = 0; i < paraNameArr.length; i++) {
 			context.setVariable(paraNameArr[i], args[i]);
+			map.put(paraNameArr[i], args[i]);
 		}
-		return parser.parseExpression(key).getValue(context, String.class);
+		
+		if (key.contains(":")) { // fieldKey = "viewNumVO:id,ids"
+			String [] fks = key.split(":");
+			Object fieldKeyOfObj = map.get(fks[0].trim());
+			try {
+				StringBuffer sb = new StringBuffer();
+				String[] fieldNames = fks[1].split(",");
+				Class<? extends Object> clazz = fieldKeyOfObj.getClass();
+				for (String fn : fieldNames) {
+					String methodName = "get" + fn.trim().substring(0, 1).toUpperCase() + fn.trim().substring(1, fn.trim().length());
+					Method fnmethod = clazz.getMethod(methodName);
+					Object resultObj = fnmethod.invoke(fieldKeyOfObj);
+					if (resultObj != null && !"".equals(resultObj)) {
+						sb.append(resultObj+"|");
+					} else {
+						throw new BusinessException("redis filedkey生成中," + clazz.getName() + "对象的属性" + fn + "不能为空值");
+					}
+				}
+				key = sb.toString();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} 
+			return key;
+		} else {
+			return parser.parseExpression(key).getValue(context, String.class);
+		}
+		
 	}
 }
