@@ -203,7 +203,8 @@ public class CacheAspect {
 				result = redisOperations.hgetValueOfList(key, fieldKey, clazz);
 			} else {
 				clazz = (Class) returnType;
-				result = redisOperations.hgetValueOfEntity(key, fieldKey, clazz);
+//				result = redisOperations.hgetValueOfEntity(key, fieldKey, clazz);
+				result = redisOperations.hgetValueOfObject(key, fieldKey, clazz);
 			}
 
 			if (result == null) {
