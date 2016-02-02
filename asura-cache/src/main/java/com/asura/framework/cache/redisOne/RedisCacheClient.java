@@ -102,6 +102,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public String get(String key) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		String result = redis.get(key);
 		pool.returnResource(redis);
 		return result;
@@ -113,6 +114,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public void setex(String key, int seconds, String value) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		redis.setex(key, seconds, value);
 		pool.returnResource(redis);
 	}
@@ -123,6 +125,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public void hset(String key, String field, Object obj) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		redis.hset(key, field, JsonEntityTransform.Object2Json(obj));
 		pool.returnResource(redis);
 	}
@@ -133,6 +136,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public <T> List<T> hgetValueOfList(String key, String field, Class<T> clazz) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		String value = redis.hget(key, field);
 		if (value == null) {
 			pool.returnResource(redis);
@@ -149,6 +153,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public <T extends BaseEntity> T hgetValueOfEntity(String key, String field, Class<T> clazz) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		String value = redis.hget(key, field);
 		if (value == null) {
 			pool.returnResource(redis);
@@ -165,6 +170,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public <T> T hgetValueOfObject(String key, String field, Class<T> clazz) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		String value = redis.hget(key, field);
 		if (value == null) {
 			pool.returnResource(redis);
@@ -178,6 +184,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public String hget(String key, String field) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		String result = redis.hget(key, field);
 		pool.returnResource(redis);
 		return result;
@@ -186,6 +193,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public boolean hexists(String key, String field) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		boolean isExists = redis.hexists(key, field);
 		pool.returnResource(redis);
 		return isExists;
@@ -194,6 +202,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public boolean exists(String key) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		boolean isExists = redis.exists(key);
 		pool.returnResource(redis);
 		return isExists;
@@ -205,6 +214,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public void hdel(String key, String... fields) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		redis.hdel(key, fields);
 		pool.returnResource(redis);
 	}
@@ -215,6 +225,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public void del(String key) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		redis.del(key);
 		pool.returnResource(redis);
 	}
@@ -225,9 +236,14 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Override
 	public long expire(String key, int seconds) {
 		ShardedJedis redis = pool.getResource();
+		key = getKeyAll(key);
 		long r = redis.expire(key, seconds);
 		pool.returnResource(redis);
 		return r;
+	}
+	
+	private String getKeyAll(String key) {
+		return app + "_" + key;
 	}
 
 }
