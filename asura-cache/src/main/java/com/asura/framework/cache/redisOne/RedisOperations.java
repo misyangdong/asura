@@ -72,6 +72,11 @@ public interface RedisOperations {
 	 * 从Hash中删除对象
 	 */
 	public void hdel(String key, String... fields);
+	
+	/**
+	 * 从string中删除对象
+	 */
+	public void del(String key);
 
 	/**
 	 * 判断是否存在该key

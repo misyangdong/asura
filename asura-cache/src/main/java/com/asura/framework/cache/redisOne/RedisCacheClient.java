@@ -208,6 +208,16 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 		redis.hdel(key, fields);
 		pool.returnResource(redis);
 	}
+	
+	/**
+	 * 从string中删除对象
+	 */
+	@Override
+	public void del(String key) {
+		ShardedJedis redis = pool.getResource();
+		redis.del(key);
+		pool.returnResource(redis);
+	}
 
 	/**
 	 * 给对应key设置存活时间
