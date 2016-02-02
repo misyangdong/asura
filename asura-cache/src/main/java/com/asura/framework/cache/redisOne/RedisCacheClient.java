@@ -126,7 +126,11 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	public void hset(String key, String field, Object obj) {
 		ShardedJedis redis = pool.getResource();
 		key = getKeyAll(key);
-		redis.hset(key, field, JsonEntityTransform.Object2Json(obj));
+		if (obj instanceof String) {
+			redis.hset(key, field, (String)obj);
+		} else {
+			redis.hset(key, field, JsonEntityTransform.Object2Json(obj));
+		}
 		pool.returnResource(redis);
 	}
 
