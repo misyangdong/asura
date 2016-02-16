@@ -56,7 +56,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Value("#{${redis.timeout}}")
 	int DEFAULT_TIMEOUT;
 
-	@Value("#{${redis.maxwait}?1000:${redis.maxwait}}")
+	@Value("#{${redis.maxwait}?:1000}")
 	int MAX_WAIT;
 
 	@Value("#{'${redis.servers}'}")
