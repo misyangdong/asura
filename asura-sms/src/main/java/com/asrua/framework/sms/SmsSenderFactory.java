@@ -16,6 +16,8 @@ import com.asrua.framework.sms.send.GenericSmsSender;
 import com.asrua.framework.sms.send.ISmsSender;
 import com.asrua.framework.sms.send.TokenSmsSender;
 import com.asura.framework.base.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 public class SmsSenderFactory {
+
     /**
      * 缓存已经创建的Sender
      */
@@ -62,10 +65,11 @@ public class SmsSenderFactory {
      * @return
      */
     private ISmsSender buildTokenSender(TokenSmsSenderConfig tokenSmsSenderConfig) {
-        ISmsSender smsSender = concurrentHashMap.get(tokenSmsSenderConfig.getSendUrl());
+        String key = tokenSmsSenderConfig.getToken()+tokenSmsSenderConfig.getSendUrl();
+        ISmsSender smsSender = concurrentHashMap.get(key);
         if (Check.NuNObj(smsSender)) {
             smsSender = new TokenSmsSender(tokenSmsSenderConfig);
-            concurrentHashMap.put(tokenSmsSenderConfig.getSendUrl(), smsSender);
+            concurrentHashMap.put(key, smsSender);
         }
         return smsSender;
     }
@@ -77,10 +81,11 @@ public class SmsSenderFactory {
      * @return
      */
     private ISmsSender buildGenericSender(GenericSmsSenderConfig genericSmsSenderConfig) {
-        ISmsSender smsSender = concurrentHashMap.get(genericSmsSenderConfig.getSendUrl());
+        String key = genericSmsSenderConfig.getAccountName()+genericSmsSenderConfig.getSendUrl();
+        ISmsSender smsSender = concurrentHashMap.get(key);
         if (Check.NuNObj(smsSender)) {
             smsSender = new GenericSmsSender(genericSmsSenderConfig);
-            concurrentHashMap.put(genericSmsSenderConfig.getSendUrl(), smsSender);
+            concurrentHashMap.put(key, smsSender);
         }
         return smsSender;
     }

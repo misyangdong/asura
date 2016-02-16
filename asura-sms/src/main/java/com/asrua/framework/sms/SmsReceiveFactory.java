@@ -61,10 +61,11 @@ public class SmsReceiveFactory {
      * @return
      */
     private ISmsReceiver buildTokenConfig(TokenSmsSenderConfig tokenSmsSenderConfig) {
-        ISmsReceiver smsReceiver = concurrentHashMap.get(tokenSmsSenderConfig.getSendUrl());
+        String key = tokenSmsSenderConfig.getToken()+tokenSmsSenderConfig.getSendUrl();
+        ISmsReceiver smsReceiver = concurrentHashMap.get(key);
         if (Check.NuNObj(smsReceiver)) {
             smsReceiver = new TokenSmsReceiver(tokenSmsSenderConfig);
-            concurrentHashMap.put(tokenSmsSenderConfig.getSendUrl(), smsReceiver);
+            concurrentHashMap.put(key, smsReceiver);
         }
         return smsReceiver;
     }
