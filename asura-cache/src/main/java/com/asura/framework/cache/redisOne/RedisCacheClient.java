@@ -56,6 +56,9 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	@Value("#{${redis.timeout}}")
 	int DEFAULT_TIMEOUT;
 
+	@Value("#{${redis.maxwait}?1000:${redis.maxwait}}")
+	int MAX_WAIT;
+
 	@Value("#{'${redis.servers}'}")
 	String servers;
 
@@ -88,7 +91,7 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 			JedisPoolConfig config = new JedisPoolConfig();
 			config.setMaxIdle(MAX_ACTIVE);
 			config.setMinIdle(MAX_IDLE);
-
+			config.setMaxWaitMillis(MAX_WAIT);
 			pool = new ShardedJedisPool(config, shards, Hashing.MURMUR_HASH);
 		} catch (NumberFormatException e) {
 			System.out.println("redis客户端初始化连接异常!!!!!!!!!  链接参数:" + servers + " " + DEFAULT_TIMEOUT + " " + app);
@@ -187,10 +190,14 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 
 	@Override
 	public String hget(String key, String field) {
+		Long t = System.currentTimeMillis();
+		logger.info("redis hget,start to getting resource from pool timestamp:{}",t);
 		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
+		logger.info("redis hget,got resource from pool, use time:{}",System.currentTimeMillis()-t);
 		String result = redis.hget(key, field);
+		logger.info("redis hget,got data from redis, use time:{}",System.currentTimeMillis()-t);
 		pool.returnResource(redis);
+		logger.info("redis hget,return resource to pool, use time:{}", System.currentTimeMillis() - t);
 		return result;
 	}
 
