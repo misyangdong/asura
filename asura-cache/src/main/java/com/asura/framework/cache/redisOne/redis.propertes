@@ -2,6 +2,8 @@
 redis.pool.minIdle=20 
 #最大能够保持idel状态的对象数  
 redis.pool.maxIdle=200
+redis.pool.maxwait=2000
+redis.pool.maxtotal=100
 redis.timeout=2000
 redis.app=order
 

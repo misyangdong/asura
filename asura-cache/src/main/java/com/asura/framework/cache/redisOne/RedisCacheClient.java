@@ -56,10 +56,16 @@ public class RedisCacheClient implements RedisOperations,
 
 	@Value("#{${redis.pool.minIdle}}")
 	int MAX_IDLE;
+	
+	@Value("#{${redis.pool.maxwait}}")
+	int MAX_WAIT;
+	
+	@Value("#{${redis.pool.maxtotal}}")
+	int MAX_TOTAL;
 
 	@Value("#{${redis.timeout}}")
 	int DEFAULT_TIMEOUT;
-
+	
 	@Value("#{'${redis.servers}'}")
 	String servers;
 
@@ -98,6 +104,8 @@ public class RedisCacheClient implements RedisOperations,
 			JedisPoolConfig config = new JedisPoolConfig();
 			config.setMaxIdle(MAX_ACTIVE);
 			config.setMinIdle(MAX_IDLE);
+			config.setMaxWaitMillis(MAX_WAIT);
+			config.setMaxTotal(MAX_TOTAL);
 
 			pool = new ShardedJedisPool(config, shards, Hashing.MURMUR_HASH);
 		} catch (NumberFormatException e) {
