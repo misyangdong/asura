@@ -30,7 +30,9 @@ import com.asura.framework.base.entity.BaseEntity;
 import com.asura.framework.base.util.JsonEntityTransform;
 
 /**
- * <p>实现类</p>
+ * <p>
+ * 实现类
+ * </p>
  * 
  * <PRE>
  * <BR>	修改记录
@@ -43,9 +45,11 @@ import com.asura.framework.base.util.JsonEntityTransform;
  * @version 1.0
  */
 @Service("redisOperations")
-public class RedisCacheClient implements RedisOperations, ApplicationContextAware {
+public class RedisCacheClient implements RedisOperations,
+		ApplicationContextAware {
 
-	private final static Logger logger = LoggerFactory.getLogger(RedisCacheClient.class);
+	private final static Logger logger = LoggerFactory
+			.getLogger(RedisCacheClient.class);
 
 	@Value("#{${redis.pool.maxIdle}}")
 	int MAX_ACTIVE;
@@ -64,11 +68,16 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 
 	private ShardedJedisPool pool;
 
-	/* (non-Javadoc)
-	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.context.ApplicationContextAware#setApplicationContext
+	 * (org.springframework.context.ApplicationContext)
 	 */
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
 		init();
 	}
 
@@ -81,7 +90,8 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 
 			for (String host : hosts) {
 				String[] ss = host.split(":");
-				JedisShardInfo shard = new JedisShardInfo(ss[0], Integer.parseInt(ss[1]), DEFAULT_TIMEOUT, 1);
+				JedisShardInfo shard = new JedisShardInfo(ss[0],
+						Integer.parseInt(ss[1]), DEFAULT_TIMEOUT, 1);
 				shards.add(shard);
 			}
 
@@ -91,8 +101,10 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 
 			pool = new ShardedJedisPool(config, shards, Hashing.MURMUR_HASH);
 		} catch (NumberFormatException e) {
-			System.out.println("redis客户端初始化连接异常!!!!!!!!!  链接参数:" + servers + " " + DEFAULT_TIMEOUT + " " + app);
-			logger.error("redis:{},exception:{}.", servers + " " + DEFAULT_TIMEOUT + " " + app, e.getMessage());
+			System.out.println("redis客户端初始化连接异常!!!!!!!!!  链接参数:" + servers
+					+ " " + DEFAULT_TIMEOUT + " " + app);
+			logger.error("redis:{},exception:{}.", servers + " "
+					+ DEFAULT_TIMEOUT + " " + app, e.getMessage());
 		}
 	}
 
@@ -101,11 +113,24 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public String get(String key) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		String result = redis.get(key);
-		pool.returnResource(redis);
-		return result;
+		ShardedJedis redis = null;
+		String result = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			result = redis.get(key);
+			return result;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+	           pool.returnBrokenResource(redis);
+	        }
+	        logger.error("redis get(String key):", e);
+	        return result;
+		} finally{ 
+            if(redis != null ) {
+                pool.returnResource(redis);
+            }
+		}
 	}
 
 	/**
@@ -113,10 +138,22 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public void setex(String key, int seconds, String value) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		redis.setex(key, seconds, value);
-		pool.returnResource(redis);
+		ShardedJedis redis = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			redis.setex(key, seconds, value);
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis setex(String key, int seconds, String value):", e);
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
+		
 	}
 
 	/**
@@ -124,14 +161,26 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public void hset(String key, String field, Object obj) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		if (obj instanceof String) {
-			redis.hset(key, field, (String)obj);
-		} else {
-			redis.hset(key, field, JsonEntityTransform.Object2Json(obj));
+		ShardedJedis redis = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			if (obj instanceof String) {
+				redis.hset(key, field, (String) obj);
+			} else {
+				redis.hset(key, field, JsonEntityTransform.Object2Json(obj));
+			}
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hset(String key, String field, Object obj):", e);
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
 		}
-		pool.returnResource(redis);
+		
 	}
 
 	/**
@@ -139,33 +188,60 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public <T> List<T> hgetValueOfList(String key, String field, Class<T> clazz) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		String value = redis.hget(key, field);
-		if (value == null) {
-			pool.returnResource(redis);
-			return null;
+		ShardedJedis redis = null;
+		List<T> entitys = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			String value = redis.hget(key, field);
+			if (value == null) {
+				return null;
+			}
+			entitys = JsonEntityTransform.json2ObjectList(value, clazz);
+			return entitys;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hgetValueOfList(String key, String field, Class<T> clazz):", e);
+	        return entitys;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
 		}
-		List<T> entitys = JsonEntityTransform.json2ObjectList(value, clazz);
-		pool.returnResource(redis);
-		return entitys;
+		
 	}
 
 	/**
 	 * 从Hash中获取对象,转换成制定类型
 	 */
 	@Override
-	public <T extends BaseEntity> T hgetValueOfEntity(String key, String field, Class<T> clazz) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		String value = redis.hget(key, field);
-		if (value == null) {
-			pool.returnResource(redis);
-			return null;
+	public <T extends BaseEntity> T hgetValueOfEntity(String key, String field,
+			Class<T> clazz) {
+		ShardedJedis redis = null;
+		T entity = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			String value = redis.hget(key, field);
+			if (value == null) {
+				return null;
+			}
+			entity = JsonEntityTransform.json2Entity(value, clazz);
+			return entity;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hgetValueOfEntity(String key, String field,Class<T> clazz):", e);
+	        return entity;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
 		}
-		T entity = JsonEntityTransform.json2Entity(value, clazz);
-		pool.returnResource(redis);
-		return entity;
+		 
 	}
 
 	/**
@@ -173,43 +249,95 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public <T> T hgetValueOfObject(String key, String field, Class<T> clazz) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		String value = redis.hget(key, field);
-		if (value == null) {
-			pool.returnResource(redis);
-			return null;
+		ShardedJedis redis = null;
+		T t = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			String value = redis.hget(key, field);
+			if (value == null) {
+				return null;
+			}
+		    t = JsonEntityTransform.json2Object(value, clazz);
+			return t;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hgetValueOfObject(String key, String field, Class<T> clazz):", e);
+	        return t;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
 		}
-		T t = JsonEntityTransform.json2Object(value, clazz);
-		pool.returnResource(redis);
-		return t;
 	}
 
 	@Override
 	public String hget(String key, String field) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		String result = redis.hget(key, field);
-		pool.returnResource(redis);
-		return result;
+		ShardedJedis redis = null;
+		String result = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			result = redis.hget(key, field);
+			return result;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hget(String key, String field):", e);
+	        return result;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
+		
 	}
 
 	@Override
 	public boolean hexists(String key, String field) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		boolean isExists = redis.hexists(key, field);
-		pool.returnResource(redis);
-		return isExists;
+		ShardedJedis redis = null;
+		boolean isExists = false;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			isExists = redis.hexists(key, field);
+			return isExists;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hexists(String key, String field):", e);
+	        return isExists;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
 	}
 
 	@Override
 	public boolean exists(String key) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		boolean isExists = redis.exists(key);
-		pool.returnResource(redis);
-		return isExists;
+		ShardedJedis redis = null;
+		boolean isExists = false;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			isExists = redis.exists(key);
+			return isExists;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis exists(String key):", e);
+	        return isExists;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
 	}
 
 	/**
@@ -217,21 +345,44 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public void hdel(String key, String... fields) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		redis.hdel(key, fields);
-		pool.returnResource(redis);
+		ShardedJedis redis = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			redis.hdel(key, fields);
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hdel(String key, String... fields):", e);
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
 	}
-	
+
 	/**
 	 * 从string中删除对象
 	 */
 	@Override
 	public void del(String key) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		redis.del(key);
-		pool.returnResource(redis);
+		ShardedJedis redis = null;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			redis.del(key);
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis hdel(String key, String... fields):", e);
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
+		
 	}
 
 	/**
@@ -239,13 +390,27 @@ public class RedisCacheClient implements RedisOperations, ApplicationContextAwar
 	 */
 	@Override
 	public long expire(String key, int seconds) {
-		ShardedJedis redis = pool.getResource();
-		key = getKeyAll(key);
-		long r = redis.expire(key, seconds);
-		pool.returnResource(redis);
-		return r;
+		ShardedJedis redis = null;
+		long r = 0L;
+		try {
+			redis = pool.getResource();
+			key = getKeyAll(key);
+			r = redis.expire(key, seconds);
+			return r;
+		} catch (RuntimeException e) { 
+	        if(redis != null ) {
+		        pool.returnBrokenResource(redis);
+		    }
+	        logger.error("redis expire(String key, int seconds):", e);
+	        return r;
+		} finally{ 
+	         if(redis != null ) {
+	            pool.returnResource(redis);
+	         }
+		}
+		
 	}
-	
+
 	private String getKeyAll(String key) {
 		return app + "_" + key;
 	}
