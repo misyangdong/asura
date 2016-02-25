@@ -18,6 +18,7 @@
 		<module>asura-quartz</module>
 		<module>asura-algorithm</module>
 		<module>asura-sms</module>
+		<module>asura-rabbitmq</module>
 	</modules>
 
 	<!-- <distributionManagement> <repository> <id>asura-release</id> <name>Asura-Release</name> 
@@ -102,12 +103,42 @@
 		<xbean-reflect.version>3.7</xbean-reflect.version>
 		<foundation-service.version>2.3.0</foundation-service.version>
 		<!-- cat end -->
+
+		<!-- rabbitmq start -->
+		<rabbitmq.version>3.6.0</rabbitmq.version>
+		<spring.rabbit.version>1.5.4.RELEASE</spring.rabbit.version>
+		<spring-amqp.version>1.1.1.RELEASE</spring-amqp.version>
+		<hessian.version>4.0.7</hessian.version>
+		<!-- rabbitmq end -->
 	</properties>
 
 
 	<dependencyManagement>
 		<dependencies>
-
+		
+			<!-- rabbitmq start -->
+			<dependency>
+				<groupId>com.rabbitmq</groupId>
+				<artifactId>amqp-client</artifactId>
+				<version>${rabbitmq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.amqp</groupId>
+				<artifactId>spring-amqp</artifactId>
+				<version>${spring-amqp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.amqp</groupId>
+				<artifactId>spring-rabbit</artifactId>
+				<version>${spring.rabbit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.caucho</groupId>
+				<artifactId>hessian</artifactId>
+				<version>${hessian.version}</version>
+			</dependency>
+			<!-- rabbitmq end -->
+			
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
