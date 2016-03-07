@@ -9,6 +9,8 @@
  */
 package com.asure.framework.rabbitmq.send;
 
+import com.asura.framework.base.exception.BusinessException;
+
 /**
  * <p>发送操作接口</p>
  * 
@@ -24,6 +26,28 @@ package com.asure.framework.rabbitmq.send;
  */
 public interface RabbitSendOperations {
 	
-	String send(String msg);
+	/**
+	 * 
+	 * 发送消息-queue方式
+	 *
+	 * @author zhangshaobin
+	 * @created 2016年3月1日 下午4:39:23
+	 *
+	 * @param queueName 格式为：系统标示_模块标示_功能标示
+	 * @param msg 具体消息
+	 */
+    public void sendQueue(String queueName, String msg) throws BusinessException;
+	
+    /**
+     * 
+     * 发送消息-topic方式
+     *
+     * @author zhangshaobin
+     * @created 2016年3月1日 下午4:40:59
+     *
+     * @param queueName 格式为：系统标示_模块标示_功能标示
+     * @param msg 具体消息
+     */
+	public void sendTopic(String queueName, String msg) throws BusinessException;
 
 }

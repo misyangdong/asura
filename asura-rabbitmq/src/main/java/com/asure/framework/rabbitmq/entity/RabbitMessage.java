@@ -9,6 +9,8 @@
  */
 package com.asure.framework.rabbitmq.entity;
 
+import java.util.Date;
+
 import com.asura.framework.base.entity.BaseEntity;
 
 /**
@@ -44,7 +46,7 @@ public class RabbitMessage extends BaseEntity{
 	/**
 	 * 发送时间串
 	 */
-	private String sendTimeStr;
+	private String sendTimeStr = new Date().toString();
 
 	/**
 	 * @return the data
@@ -87,5 +89,6 @@ public class RabbitMessage extends BaseEntity{
 	public void setSendTimeStr(String sendTimeStr) {
 		this.sendTimeStr = sendTimeStr;
 	}
+	
 
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd">
+ 
+     <bean id="rabbitConnectionFactory" class="com.asure.framework.rabbitmq.connection.RabbitConnectionFactory" init-method="init" />
+     
+     <bean id="rabbitSendClient" class="com.asure.framework.rabbitmq.send.RabbitSendClient">
+     	<property name="rabbitConnectionFactory" ref="rabbitConnectionFactory" />
+     </bean>
+     
+    
+     <bean id="sampleMessageLitener" class="com.asure.framework.rabbitmq.SampleMessageLitener" />
+     <bean id="sampleMessageLitener2" class="com.asure.framework.rabbitmq.SampleMessageLitener2" />
+     
+     
+     <bean id="sampleWorkerRec" class="com.asure.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage" >
+     	<constructor-arg index="0">
+     		<ref bean="rabbitConnectionFactory" />
+     	</constructor-arg>
+     	<constructor-arg index="1">
+     		<ref bean="sampleMessageLitener" />
+     	</constructor-arg>
+     	<constructor-arg index="2">
+     		<value>dayu_003</value>
+     	</constructor-arg>
+     </bean>
+     
+     
+     <bean id="sampleWorker2Rec" class="com.asure.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage"  >
+     	<constructor-arg index="0">
+     		<ref bean="rabbitConnectionFactory" />
+     	</constructor-arg>
+     	<constructor-arg index="1">
+     		<ref bean="sampleMessageLitener2" />
+     	</constructor-arg>
+     	<constructor-arg index="2">
+     		<value>dayu_004</value>
+     	</constructor-arg>
+     </bean>
+     
+     
+     
+   
+</beans>
