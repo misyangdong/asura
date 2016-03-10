@@ -8,8 +8,10 @@
  */
 package com.asura.framework.rabbbitmq;
 
+import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.send.RabbitMqSendClient;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -27,11 +29,17 @@ import org.junit.Test;
  */
 public class T_RabbitMqSendUtil {
 
+    RabbitConnectionFactory connectionFactory;
+
+    @Before
+    public void testBefore(){
+        connectionFactory = new RabbitConnectionFactory();
+        connectionFactory.init();
+    }
+
     @Test
     public void testSendQueue() throws Exception {
         RabbitMqSendClient client = new RabbitMqSendClient();
-        RabbitConnectionFactory connectionFactory = new RabbitConnectionFactory();
-        connectionFactory.init();
         client.setRabbitConnectionFactory(connectionFactory);
         int i =0;
         String s = "";
@@ -39,9 +47,47 @@ public class T_RabbitMqSendUtil {
             if(s.length()<2048) {
                 s += i;
             }
-            client.sendQueue("LSQ_QUEUE_01", "HELLO WORLD +" +s);
+            client.sendQueue("LSQ_QUEUE_02", "HELLO WORLD +" +s);
         }
     }
 
+    @Test
+    public void testSendQueue2()throws Exception {
+        RabbitMqSendClient client = new RabbitMqSendClient();
+        client.setRabbitConnectionFactory(connectionFactory);
+        int i =0;
+        String s = "";
+        while (++i<100000) {
+            if(s.length()<2048) {
+                s += i;
+            }
+            client.sendQueue("LSQ_QUEUE_03", "HELLO WORLD +" +s);
+        }
+    }
+
+    @Test
+    public void testSendTopic() throws Exception {
+        RabbitMqSendClient client = new RabbitMqSendClient();
+        client.setRabbitConnectionFactory(connectionFactory);
+        int i =0;
+        String s = "";
+        while (++i<100000) {
+            if(s.length()<2048) {
+                s += i;
+            }
+            String routingKey = "";
+            if(i%3==1){
+                routingKey = "bbb";
+            }
+            if(i%3==2){
+                routingKey = "ddd";
+            }
+            if(i%3==0){
+                routingKey = "xxx";
+            }
+            client.sendTopic("LSQ_EXCHANGE_D_01",routingKey , PublishSubscribeType.DIRECT,"hello world "+i);
+            System.out.println(i);
+        }
+    }
 
 }

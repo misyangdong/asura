@@ -37,13 +37,6 @@ public class SampleMessageLitener implements IRabbitMqMessageLisenter {
 		String jsonStr = new String(delivery.getBody());
 		RabbitMessage rm = JsonEntityTransform.json2Entity(jsonStr, RabbitMessage.class);
 		System.out.println("接受者。。。。。" + rm.toJsonStr());
-		try {
-			Thread.sleep(60000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 }

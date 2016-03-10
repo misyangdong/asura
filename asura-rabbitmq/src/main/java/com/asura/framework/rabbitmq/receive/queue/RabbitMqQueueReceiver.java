@@ -63,6 +63,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
     protected void doConsumeQueueMessage(Connection connection) throws IOException, InterruptedException {
         Channel channel = connection.createChannel();
         channel.queueDeclare(this.getQueueName(), true, false, false, null);
+        channel.basicQos(1);
         QueueingConsumer consumer = new QueueingConsumer(channel);
         channel.basicConsume(this.getQueueName(),false,consumer);
         while(true){

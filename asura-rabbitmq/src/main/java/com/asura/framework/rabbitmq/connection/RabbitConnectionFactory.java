@@ -214,9 +214,15 @@ public class RabbitConnectionFactory {
 	 * @throws Exception
 	 * @throws TimeoutException
 	 */
-	public Connection getConnection() throws Exception, TimeoutException {
-
-		return getConnectFactory().newConnection();
+	public Connection getConnection() throws Exception {
+		if(connection == null){
+			synchronized (this){
+				if(connection == null){
+					connection = getConnectFactory().newConnection();
+				}
+			}
+		}
+		return connection;
 	}
 
 	/**
@@ -241,19 +247,26 @@ public class RabbitConnectionFactory {
 	 * @author zhangshaobin
 	 * @created 2016年3月1日 下午4:36:57
 	 *
-	 * @param connection
 	 * @param channel
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public void close(Connection connection, Channel channel)
-			throws IOException, TimeoutException {
+	public void closeChannel(Channel channel)throws IOException, TimeoutException {
 		if (channel != null) {
 			channel.close();
 		}
+
+	}
+
+	/**
+	 *
+	 * @param
+	 * @throws IOException
+	 */
+	public void closeConnection() throws IOException {
 		if (connection != null) {
+			System.out.println("mq connection factory close connection");
 			connection.close();
 		}
 	}
-
 }

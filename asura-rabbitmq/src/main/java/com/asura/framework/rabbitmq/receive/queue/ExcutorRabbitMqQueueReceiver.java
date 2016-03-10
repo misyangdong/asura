@@ -58,7 +58,9 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
     @Override
     protected void doConsumeQueueMessage(Connection connection){
-        this.executorService.submit(new ConsumeWorker(this.getQueueName(),connection, this.getRabbitMqMessageLiteners()));
+        for(int i = 0; i<poolSize;i++) {
+            this.executorService.submit(new ConsumeWorker(this.getQueueName(), connection, this.getRabbitMqMessageLiteners()));
+        }
     }
 
     private class ConsumeWorker implements Runnable{
@@ -84,6 +86,7 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 Channel channel = connection.createChannel();
                 channel.queueDeclare(queueName, true, false, false, null);
                 QueueingConsumer consumer = new QueueingConsumer(channel);
+                channel.basicQos(1);
                 channel.basicConsume(queueName,false,consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();

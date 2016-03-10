@@ -43,4 +43,11 @@ public class T_RabbitConnectionFactorySpring {
     }
 
 
+    @Test
+    public void testSendQueue2()throws Exception {
+        while(true) {
+            rabbitSendClient.sendQueue("LSQ_QUEUE_02", "HELLO WORLD +");
+        }
+    }
+
 }

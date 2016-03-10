@@ -79,7 +79,6 @@ public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
         this.rabbitConnectionFactory = rabbitConnectionFactory;
     }
 
-    @Override
     public List<IRabbitMqMessageLisenter> getRabbitMqMessageLiteners() {
         return rabbitMqMessageLiteners;
     }
