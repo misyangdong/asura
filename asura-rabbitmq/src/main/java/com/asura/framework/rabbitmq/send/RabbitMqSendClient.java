@@ -37,12 +37,14 @@ import com.rabbitmq.client.MessageProperties;
  * @since 1.0
  * @version 1.0
  */
-public class RabbitSendClient implements RabbitSendOperations{
+public class RabbitMqSendClient implements RabbitSendOperations{
 	
-	private final static Logger logger = LoggerFactory.getLogger(RabbitSendClient.class);
+	private final static Logger logger = LoggerFactory.getLogger(RabbitMqSendClient.class);
 	
 	private RabbitConnectionFactory rabbitConnectionFactory;
-	
+
+	public Connection connection;
+	public Channel channel;
 
 	/**
 	 * @return the rabbitConnectionFactory
@@ -60,6 +62,12 @@ public class RabbitSendClient implements RabbitSendOperations{
 		this.rabbitConnectionFactory = rabbitConnectionFactory;
 	}
 
+	public void init() throws Exception {
+		if(connection == null){
+			connection = rabbitConnectionFactory.getConnection();
+			channel = rabbitConnectionFactory.getChannel(connection);
+		}
+	}
 
 	/**
 	 * 
@@ -71,22 +79,19 @@ public class RabbitSendClient implements RabbitSendOperations{
 	 * @param queueName 格式为：系统标示_模块标示_功能标示
 	 * @param msg 具体消息
 	 */
-	public void sendQueue(String queueName, String msg) throws BusinessException{
+	public void sendQueue(String queueName, String msg) throws Exception {
+		init();
 		//加入cat
 		//创建连接
 	    //描述队列
 	   	//发送消息
 	   	//关闭连接、关闭通道
 	   	Transaction tran = Cat.newTransaction("rabbitmq-send", queueName);
-	   	Connection connection = null;
-	   	Channel channel = null;
 	   	try {
 			RabbitMessage rm = new RabbitMessage();
 			rm.setData(msg);
 			rm.setType(queueName);
-			connection = rabbitConnectionFactory.getConnection();
-			channel = rabbitConnectionFactory.getChannel(connection);
-			channel.queueDeclare(queueName, true, false, false, null);
+			channel.queueDeclare(queueName, false, false, false, null);
 			channel.basicPublish("", queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
 			Cat.logMetricForCount(queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
 			tran.setStatus(Transaction.SUCCESS);
@@ -95,15 +100,6 @@ public class RabbitSendClient implements RabbitSendOperations{
 			Cat.logError(err, e);
 			tran.setStatus(e);
 			throw new BusinessException(err, e);
-		} finally {
-			try {
-				rabbitConnectionFactory.close(connection, channel);
-			} catch (IOException e) {
-				logger.error("关闭rabbitmq连接异常", e);
-			} catch (TimeoutException e) {
-				logger.error("关闭rabbitmq连接异常", e);
-			}
-			tran.complete();
 		}
 	}
 	

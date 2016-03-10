@@ -12,7 +12,10 @@ package com.asura.framework.rabbitmq.receive;
 import com.rabbitmq.client.QueueingConsumer.Delivery;
 
 /**
- * <p>TODO</p>
+ * <p>
+ *     消息监听器接口
+ *     实现此接口需要实现具体的消息处理机制
+ * </p>
  * 
  * <PRE>
  * <BR>	修改记录
@@ -24,8 +27,12 @@ import com.rabbitmq.client.QueueingConsumer.Delivery;
  * @since 1.0
  * @version 1.0
  */
-public interface RabbitMqMessageLitener {
-	
+public interface IRabbitMqMessageLisenter {
+
+	/**
+	 * 接口方法实现消息的处理
+	 * @param delivery
+	 */
 	void processMessage(Delivery delivery);
 
 }

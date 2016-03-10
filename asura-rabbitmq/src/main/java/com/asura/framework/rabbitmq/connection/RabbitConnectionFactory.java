@@ -60,6 +60,8 @@ public class RabbitConnectionFactory {
 
 	private ConnectionFactory connectionFactory = null;
 
+	private Connection connection;
+
 	/**
 	 * 
 	 * 初始化
@@ -70,7 +72,6 @@ public class RabbitConnectionFactory {
 	 */
 	public void init() {
 		initialize("rabbit.propertes");
-		this.getConnectFactory();
 	}
 
 	/**
@@ -214,6 +215,7 @@ public class RabbitConnectionFactory {
 	 * @throws TimeoutException
 	 */
 	public Connection getConnection() throws Exception, TimeoutException {
+
 		return getConnectFactory().newConnection();
 	}
 

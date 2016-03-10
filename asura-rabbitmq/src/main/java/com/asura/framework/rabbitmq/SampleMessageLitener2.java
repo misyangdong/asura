@@ -9,7 +9,7 @@
  */
 package com.asura.framework.rabbitmq;
 
-import com.asura.framework.rabbitmq.receive.RabbitMqMessageLitener;
+import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.QueueingConsumer.Delivery;
 
 /**
@@ -25,7 +25,7 @@ import com.rabbitmq.client.QueueingConsumer.Delivery;
  * @since 1.0
  * @version 1.0
  */
-public class SampleMessageLitener2 implements RabbitMqMessageLitener {
+public class SampleMessageLitener2 implements IRabbitMqMessageLisenter {
 
 	/* (non-Javadoc)
 	 * @see com.asure.framework.rabbitmq.receive.IWorker#processMessage(com.rabbitmq.client.QueueingConsumer.Delivery)

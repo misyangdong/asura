@@ -44,11 +44,11 @@ public class RabbitMqReceive {
 	
 	private RabbitConnectionFactory rcf;
 	
-	private RabbitMqMessageLitener rabbitMqMessageLitener;
+	private IRabbitMqMessageLisenter rabbitMqMessageLitener;
 	
 	private String queueName;
 
-    public RabbitMqReceive(RabbitConnectionFactory rcf, RabbitMqMessageLitener rabbitMqMessageLitener, String queueName){
+    public RabbitMqReceive(RabbitConnectionFactory rcf, IRabbitMqMessageLisenter rabbitMqMessageLitener, String queueName){
     	this.rcf = rcf;
         this.rabbitMqMessageLitener = rabbitMqMessageLitener;
         this.queueName = queueName;
@@ -70,11 +70,11 @@ class ReceiveThread implements Runnable {
 	
 	private RabbitConnectionFactory rcf;
 	
-	private RabbitMqMessageLitener rabbitMqMessageLitener;
+	private IRabbitMqMessageLisenter rabbitMqMessageLitener;
 	
 	private String queueName;
 	
-	public ReceiveThread(RabbitConnectionFactory rcf, RabbitMqMessageLitener rabbitMqMessageLitener, String queueName){
+	public ReceiveThread(RabbitConnectionFactory rcf, IRabbitMqMessageLisenter rabbitMqMessageLitener, String queueName){
     	this.rcf = rcf;
         this.rabbitMqMessageLitener = rabbitMqMessageLitener;
         this.queueName = queueName;

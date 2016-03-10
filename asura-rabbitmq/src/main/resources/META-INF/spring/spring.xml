@@ -8,18 +8,18 @@
             http://www.springframework.org/schema/context
                 http://www.springframework.org/schema/context/spring-context.xsd">
  
-     <bean id="rabbitConnectionFactory" class="com.asure.framework.rabbitmq.connection.RabbitConnectionFactory" init-method="init" />
+     <bean id="rabbitConnectionFactory" class="com.asura.framework.rabbitmq.connection.RabbitConnectionFactory" init-method="init" />
      
-     <bean id="rabbitSendClient" class="com.asure.framework.rabbitmq.send.RabbitSendClient">
+     <bean id="rabbitSendClient" class="com.asura.framework.rabbitmq.send.RabbitMqSendClient">
      	<property name="rabbitConnectionFactory" ref="rabbitConnectionFactory" />
      </bean>
      
     
-     <bean id="sampleMessageLitener" class="com.asure.framework.rabbitmq.SampleMessageLitener" />
-     <bean id="sampleMessageLitener2" class="com.asure.framework.rabbitmq.SampleMessageLitener2" />
+     <bean id="sampleMessageLitener" class="com.asura.framework.rabbitmq.SampleMessageLitener" />
+     <bean id="sampleMessageLitener2" class="com.asura.framework.rabbitmq.SampleMessageLitener2" />
      
      
-     <bean id="sampleWorkerRec" class="com.asure.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage" >
+     <bean id="sampleWorkerRec" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage" >
      	<constructor-arg index="0">
      		<ref bean="rabbitConnectionFactory" />
      	</constructor-arg>
@@ -32,7 +32,7 @@
      </bean>
      
      
-     <bean id="sampleWorker2Rec" class="com.asure.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage"  >
+     <bean id="sampleWorker2Rec" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive" init-method="consumerQueueMessage"  >
      	<constructor-arg index="0">
      		<ref bean="rabbitConnectionFactory" />
      	</constructor-arg>

@@ -36,7 +36,7 @@ public interface RabbitSendOperations {
 	 * @param queueName 格式为：系统标示_模块标示_功能标示
 	 * @param msg 具体消息
 	 */
-    public void sendQueue(String queueName, String msg) throws BusinessException;
+    public void sendQueue(String queueName, String msg) throws Exception;
 	
     /**
      * 
