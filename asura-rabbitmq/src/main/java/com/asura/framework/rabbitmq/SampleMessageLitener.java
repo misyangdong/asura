@@ -36,7 +36,7 @@ public class SampleMessageLitener implements IRabbitMqMessageLisenter {
 	public void processMessage(Delivery delivery) {
 		String jsonStr = new String(delivery.getBody());
 		RabbitMessage rm = JsonEntityTransform.json2Entity(jsonStr, RabbitMessage.class);
-		System.out.println("接受者。。。。。" + rm.toJsonStr());
+		System.out.println("接受者:[" +delivery.getEnvelope().getRoutingKey()+"]"+ rm.toJsonStr());
 	}
 
 }
