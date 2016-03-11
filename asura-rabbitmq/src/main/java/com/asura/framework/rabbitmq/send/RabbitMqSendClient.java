@@ -126,7 +126,7 @@ public class RabbitMqSendClient {
             rm.setData(msg);
             rm.setType(exchangeName);
             topicChannel.exchangeDeclare(exchangeName, type.getName(),true);
-            topicChannel.basicPublish(exchangeName, routingKey, null, msg.getBytes());
+            topicChannel.basicPublish(exchangeName, routingKey, null, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = exchangeName + "  rabbitmq发送消息异常";
             throw new BusinessException(err, e);
