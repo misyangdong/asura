@@ -11,7 +11,10 @@ package com.asura.framework.rabbitmq.send;
 import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.ExchangeName;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.entity.RabbitMessage;
+import com.asura.framework.rabbitmq.entity.RoutingKey;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
@@ -94,14 +97,14 @@ public class RabbitMqSendClient {
      * @param queueName 格式为：系统标示_模块标示_功能标示
      * @param msg 具体消息
      */
-    public void sendQueue(String queueName, String msg) throws Exception {
+    public void sendQueue(QueueName queueName, String msg) throws Exception {
         initQueueChannel();
         try {
             RabbitMessage rm = new RabbitMessage();
             rm.setData(msg);
-            rm.setType(queueName);
-            queueChannel.queueDeclare(queueName, true, false, false, null);
-            queueChannel.basicPublish("", queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
+            rm.setType(queueName.getName());
+            queueChannel.queueDeclare(queueName.getName(), true, false, false, null);
+            queueChannel.basicPublish("", queueName.getName(), MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = queueName + "  rabbitmq发送消息异常";
             throw new BusinessException(err, e);
@@ -119,14 +122,14 @@ public class RabbitMqSendClient {
      * @param exchangeName 格式为：系统标示_模块标示_功能标示
      * @param msg 具体消息
      */
-    public void sendTopic( String exchangeName, String routingKey, PublishSubscribeType type, String msg) throws Exception {
+    public void sendTopic( ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
         initTopicChannel();
         try {
             RabbitMessage rm = new RabbitMessage();
             rm.setData(msg);
-            rm.setType(exchangeName);
-            topicChannel.exchangeDeclare(exchangeName, type.getName(),true);
-            topicChannel.basicPublish(exchangeName, routingKey, null, rm.toJsonStr().getBytes());
+            rm.setType(exchangeName.getName());
+            topicChannel.exchangeDeclare(exchangeName.getName(), type.getName(),true);
+            topicChannel.basicPublish(exchangeName.getName(), routingKey.getKey(), null, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = exchangeName + "  rabbitmq发送消息异常";
             throw new BusinessException(err, e);

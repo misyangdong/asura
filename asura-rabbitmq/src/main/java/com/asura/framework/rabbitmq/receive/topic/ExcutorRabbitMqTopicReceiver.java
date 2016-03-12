@@ -10,6 +10,8 @@ package com.asura.framework.rabbitmq.receive.topic;
 
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.BindingKey;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.*;
 
@@ -45,32 +47,32 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String queueName, String bindingKey, String exchangeName) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, QueueName queueName, BindingKey bindingKey, String exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName,bindingKey, exchangeName, PublishSubscribeType.DIRECT);
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,String queueName,  String bindingKey, String exchangeName, int poolSize) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,QueueName queueName, BindingKey bindingKey, String exchangeName, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String queueName, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, QueueName queueName, BindingKey bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, publishSubscribeType);
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,  String bindingKey, String exchangeName) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,  BindingKey bindingKey, String exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners, null,bindingKey, exchangeName, PublishSubscribeType.DIRECT);
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String bindingKey, String exchangeName, int poolSize) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, BindingKey bindingKey, String exchangeName, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
-    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
+    public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, BindingKey bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, publishSubscribeType);
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
@@ -84,19 +86,19 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
 
     private class ConsumeWorker implements Runnable {
 
-        private String queueName;
+        private QueueName queueName;
 
         private Connection connection;
 
         private String exchangeName;
 
-        private String bindingKey;
+        private BindingKey bindingKey;
 
         private String routingType;
 
         private List<IRabbitMqMessageLisenter> lisenters;
 
-        private ConsumeWorker(Connection connection, String exchangeName, String queueName,String bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
+        private ConsumeWorker(Connection connection, String exchangeName, QueueName queueName,BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
             this.bindingKey = bindingKey;
             this.exchangeName = exchangeName;
             this.routingType = routingType;
@@ -110,22 +112,20 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
             try {
                 Channel channel = connection.createChannel();
                 channel.exchangeDeclare(exchangeName, routingType, true);
-                if(queueName ==null){
-                    queueName = channel.queueDeclare().getQueue();
+                String qname = null;
+                if(queueName == null){
+                    qname = channel.queueDeclare().getQueue();
                 }else{
-                    channel.queueDeclare(queueName,true,false,false,null);
+                    qname = queueName.getName();
+                    channel.queueDeclare(qname,true,false,false,null);
                 }
-                channel.queueBind(queueName, exchangeName, bindingKey);
+                channel.queueBind(qname, exchangeName, bindingKey.getKey());
                 QueueingConsumer consumer = new QueueingConsumer(channel);
-                channel.basicConsume(queueName,false,consumer);
+                channel.basicConsume(qname, false, consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
                     for(IRabbitMqMessageLisenter lisenter:lisenters){
-                        try {
                             lisenter.processMessage(delivery);
-                        }catch (Exception e){
-                            //TODO error message
-                        }
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
                 }

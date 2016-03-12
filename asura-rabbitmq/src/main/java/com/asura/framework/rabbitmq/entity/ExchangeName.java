@@ -1,8 +1,8 @@
 /**
- * @FileName: RoutingKey.java
+ * @FileName: ExchangeName.java
  * @Package: com.asura.framework.rabbitmq.entity
  * @author sence
- * @created 3/12/2016 11:14 AM
+ * @created 3/12/2016 12:32 PM
  * <p/>
  * Copyright 2015 ziroom
  */
@@ -23,30 +23,30 @@ import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
  * @since 1.0
  * @version 1.0
  */
-public class RoutingKey extends NameKey {
+public class ExchangeName extends QueueName {
 
-    public RoutingKey() {
+    public ExchangeName(){
 
     }
 
-    public RoutingKey(String system, String module, String function) {
+    public ExchangeName(String system, String module, String function) {
         super(system, module, function);
     }
 
     /**
-     * 获取到routingKey
+     *
      */
-    public String getKey() throws AsuraRabbitMqException {
+    public String getName() throws AsuraRabbitMqException {
         if(this.getSystem()==null ||"".equals(this.getSystem())){
-            throw new AsuraRabbitMqException("RoutingKey:system is null");
+            throw new AsuraRabbitMqException("QueueName:system is null");
         }
         if(this.getModule()==null || "".equals(this.getModule())){
-            throw new AsuraRabbitMqException("RoutingKey:module is null");
+            throw new AsuraRabbitMqException("QueueName:module is null");
         }
         if(this.getFunction()==null ||"".equals(this.getFunction())){
-            throw new AsuraRabbitMqException("RoutingKey:function is null");
+            throw new AsuraRabbitMqException("QueueName:function is null");
         }
-        return getSystem()+"."+getModule()+"."+getFunction();
+        return "EX_"+getSystem()+"_"+getModule()+"_"+getFunction();
     }
 
 }

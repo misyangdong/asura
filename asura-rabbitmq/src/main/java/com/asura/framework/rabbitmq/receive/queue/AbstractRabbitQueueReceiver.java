@@ -10,6 +10,7 @@ package com.asura.framework.rabbitmq.receive.queue;
 
 import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Connection;
@@ -32,13 +33,13 @@ import java.util.List;
  */
 public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiver {
 
-    private String queueName;
+    private QueueName queueName;
 
     public AbstractRabbitQueueReceiver() {
 
     }
 
-    public AbstractRabbitQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String queueName) {
+    public AbstractRabbitQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, QueueName queueName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners);
         this.queueName = queueName;
     }
@@ -53,11 +54,11 @@ public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiv
 
     protected abstract void doConsumeQueueMessage(Connection connection)throws IOException, InterruptedException;
 
-    public String getQueueName() {
+    public QueueName getQueueName() {
         return queueName;
     }
 
-    public void setQueueName(String queueName) {
+    public void setQueueName(QueueName queueName) {
         this.queueName = queueName;
     }
 }

@@ -10,6 +10,7 @@ package com.asura.framework.rabbitmq.receive.queue;
 
 import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Channel;
@@ -46,12 +47,12 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,String queueName) {
+    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,QueueName queueName) {
         super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, int poolSize, String queueName) {
+    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, int poolSize, QueueName queueName) {
         super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
         executorService = Executors.newFixedThreadPool(poolSize);
     }
@@ -65,13 +66,13 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
     private class ConsumeWorker implements Runnable{
 
-        private String queueName;
+        private QueueName queueName;
 
         private Connection connection;
 
         private List<IRabbitMqMessageLisenter> lisenters;
 
-        private ConsumeWorker(String queueName,Connection connection,List<IRabbitMqMessageLisenter> lisenters){
+        private ConsumeWorker(QueueName queueName,Connection connection,List<IRabbitMqMessageLisenter> lisenters){
             this.queueName = queueName;
             this.connection = connection;
             this.lisenters = lisenters;
@@ -84,10 +85,10 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     throw new BusinessException("queueName not set");
                 }
                 Channel channel = connection.createChannel();
-                channel.queueDeclare(queueName, true, false, false, null);
+                channel.queueDeclare(queueName.getName(), true, false, false, null);
                 QueueingConsumer consumer = new QueueingConsumer(channel);
                 channel.basicQos(1);
-                channel.basicConsume(queueName,false,consumer);
+                channel.basicConsume(queueName.getName(),false,consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
                     for(IRabbitMqMessageLisenter lisenter:lisenters){

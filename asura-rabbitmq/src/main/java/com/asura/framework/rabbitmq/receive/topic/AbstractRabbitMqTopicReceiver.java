@@ -11,6 +11,9 @@ package com.asura.framework.rabbitmq.receive.topic;
 import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.BindingKey;
+import com.asura.framework.rabbitmq.entity.ExchangeName;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Connection;
@@ -36,15 +39,15 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
     /**
      * 队列名称
      */
-    private String queueName;
+    private QueueName queueName;
     /**
      * 绑定key
      */
-    private String bindingKey;
+    private BindingKey bindingKey;
     /**
      * exchange 名称
      */
-    private String exchangeName;
+    private ExchangeName exchangeName;
     /**
      * 发布类型
      */
@@ -55,7 +58,8 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
         super();
     }
 
-    public AbstractRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String queueName, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+    public AbstractRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
+                                         QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners);
         this.queueName = queueName;
         this.bindingKey = bindingKey;
@@ -79,27 +83,27 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
 
     protected abstract void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException;
 
-    public String getQueueName() {
+    public QueueName getQueueName() {
         return queueName;
     }
 
-    public void setQueueName(String queueName) {
+    public void setQueueName(QueueName queueName) {
         this.queueName = queueName;
     }
 
-    public String getBindingKey() {
+    public BindingKey getBindingKey() {
         return bindingKey;
     }
 
-    public void setBindingKey(String bindingKey) {
+    public void setBindingKey(BindingKey bindingKey) {
         this.bindingKey = bindingKey;
     }
 
-    public String getExchangeName() {
+    public ExchangeName getExchangeName() {
         return exchangeName;
     }
 
-    public void setExchangeName(String exchangeName) {
+    public void setExchangeName(ExchangeName exchangeName) {
         this.exchangeName = exchangeName;
     }
 

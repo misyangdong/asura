@@ -37,7 +37,7 @@ public class BindingKey extends NameKey {
     /**
      * 获取到routingKey
      */
-    public String getBindingKey() throws AsuraRabbitMqException {
+    public String getKey() throws AsuraRabbitMqException {
         if(this.getSystem()==null ||"".equals(this.getSystem())){
             this.setSystem("*");
         }

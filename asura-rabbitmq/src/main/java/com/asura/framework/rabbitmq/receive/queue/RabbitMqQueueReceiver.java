@@ -10,6 +10,7 @@ package com.asura.framework.rabbitmq.receive.queue;
 
 import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Channel;
@@ -48,7 +49,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
      * @param rabbitMqMessageLiteners
      * @param queueName
      */
-    public RabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,String queueName) {
+    public RabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,QueueName queueName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName);
     }
 
@@ -62,10 +63,10 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
     @Override
     protected void doConsumeQueueMessage(Connection connection) throws IOException, InterruptedException {
         Channel channel = connection.createChannel();
-        channel.queueDeclare(this.getQueueName(), true, false, false, null);
+        channel.queueDeclare(this.getQueueName().getName(), true, false, false, null);
         channel.basicQos(1);
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(this.getQueueName(),false,consumer);
+        channel.basicConsume(this.getQueueName().getName(),false,consumer);
         while(true){
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             for(IRabbitMqMessageLisenter lisenter:super.getRabbitMqMessageLiteners()){

@@ -36,7 +36,7 @@ public class QueueName extends NameKey {
     /**
      *
      */
-    public String getQueueName() throws AsuraRabbitMqException{
+    public String getName() throws AsuraRabbitMqException{
         if(this.getSystem()==null ||"".equals(this.getSystem())){
             throw new AsuraRabbitMqException("QueueName:system is null");
         }
