@@ -34,6 +34,10 @@ import java.util.List;
 public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqReceiver {
 
     /**
+     * 队列名称
+     */
+    private String queueName;
+    /**
      * 绑定key
      */
     private String bindingKey;
@@ -51,8 +55,9 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
         super();
     }
 
-    public AbstractRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+    public AbstractRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String queueName, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners);
+        this.queueName = queueName;
         this.bindingKey = bindingKey;
         this.exchangeName = exchangeName;
         this.publishSubscribeType = publishSubscribeType;
@@ -72,7 +77,15 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
         doConsumeTopicMessage(connection);
     }
 
-    protected abstract void doConsumeTopicMessage(Connection connection)throws IOException, InterruptedException;
+    protected abstract void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException;
+
+    public String getQueueName() {
+        return queueName;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
 
     public String getBindingKey() {
         return bindingKey;

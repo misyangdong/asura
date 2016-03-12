@@ -36,12 +36,24 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
     }
 
-    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, String bindingKey, String exchangeName) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
+                                 String bindingKey, String exchangeName) {
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
     }
 
-    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,  String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners, bindingKey, exchangeName, publishSubscribeType);
+    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
+                                 String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, publishSubscribeType);
+    }
+
+    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
+                                 String queueName, String bindingKey, String exchangeName) {
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+    }
+
+    public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
+                                 String queueName, String bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, publishSubscribeType);
     }
 
     /**
@@ -54,14 +66,20 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
     public void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException {
         Channel channel = connection.createChannel();
         channel.exchangeDeclare(this.getExchangeName(), this.getPublishSubscribeType().getName(), true);
-        String queueName = channel.queueDeclare().getQueue();
-        channel.queueBind(queueName, this.getExchangeName(), this.getBindingKey());
+        if(this.getQueueName() ==null){
+           String queueName = channel.queueDeclare().getQueue();
+            this.setQueueName(queueName);
+        }else{
+            channel.queueDeclare(this.getQueueName() ,true,false,false,null);
+        }
+        channel.queueBind(this.getQueueName() , this.getExchangeName(), this.getBindingKey());
         QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(queueName,false,consumer);
+        channel.basicConsume(this.getQueueName() ,false,consumer);
         while(true){
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             for(IRabbitMqMessageLisenter lisenter:super.getRabbitMqMessageLiteners()){
                 lisenter.processMessage(delivery);
+                //TODO
             }
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
         }

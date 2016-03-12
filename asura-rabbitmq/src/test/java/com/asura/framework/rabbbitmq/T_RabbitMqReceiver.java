@@ -41,7 +41,7 @@ public class T_RabbitMqReceiver {
     @Test
     public void testSingleThradReceiver() throws Exception {
         RabbitMqQueueReceiver rabbitMqReceiver = new RabbitMqQueueReceiver();
-        rabbitMqReceiver.setQueueName("LSQ_QUEUE_03");
+        rabbitMqReceiver.setQueueName("LSQ_QUEUE_02");
         RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
         rabbitConnectionFactory.init();
         rabbitMqReceiver.setRabbitConnectionFactory(rabbitConnectionFactory);
@@ -56,7 +56,7 @@ public class T_RabbitMqReceiver {
     @Test
     public void testExecutorReceiver() throws Exception {
         ExcutorRabbitMqQueueReceiver rabbitMqReceiver = new ExcutorRabbitMqQueueReceiver();
-        rabbitMqReceiver.setQueueName("LSQ_QUEUE_03");
+        rabbitMqReceiver.setQueueName("LSQ_QUEUE_02");
         RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
         rabbitConnectionFactory.init();
         rabbitMqReceiver.setPoolSize(5);
@@ -70,6 +70,23 @@ public class T_RabbitMqReceiver {
     }
 
     @Test
+    public void testTopicReceiver() throws Exception {
+        RabbitMqTopicReceiver rabbitMqReceiver = new RabbitMqTopicReceiver();
+        RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
+        rabbitConnectionFactory.init();
+        rabbitMqReceiver.setRabbitConnectionFactory(rabbitConnectionFactory);
+        IRabbitMqMessageLisenter lisenter = new SampleMessageLitener();
+        List<IRabbitMqMessageLisenter> lisenterList = new ArrayList<>();
+        lisenterList.add(lisenter);
+        rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
+        rabbitMqReceiver.setBindingKey("bbb");
+        rabbitMqReceiver.setExchangeName("LSQ_EXCHANGE_D_01");
+        rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.DIRECT);
+        rabbitMqReceiver.receiveMessage();
+    }
+
+
+    @Test
     public void testExecutorTopicReceiver() throws Exception {
         RabbitMqTopicReceiver rabbitMqReceiver = new RabbitMqTopicReceiver();
         RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
@@ -80,10 +97,10 @@ public class T_RabbitMqReceiver {
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
         rabbitMqReceiver.setBindingKey("xxx");
+        rabbitMqReceiver.setQueueName("LSQ_TOPIC_02");
         rabbitMqReceiver.setExchangeName("LSQ_EXCHANGE_D_01");
         rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.DIRECT);
         rabbitMqReceiver.receiveMessage();
-        Thread.sleep(1000000);
     }
 
 }

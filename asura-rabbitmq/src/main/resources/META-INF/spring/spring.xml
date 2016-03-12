@@ -16,7 +16,7 @@
     <bean id="sampleMessageLitener2" class="com.asura.framework.rabbitmq.SampleMessageLitener2"/>
 
 
-    <bean id="sampleWorkerRec" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive"
+    <bean id="sampleWorkerRec1" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive"
           init-method="consumerQueueMessage">
         <constructor-arg index="0">
             <ref bean="rabbitConnectionFactory"/>
@@ -25,10 +25,22 @@
             <ref bean="sampleMessageLitener"/>
         </constructor-arg>
         <constructor-arg index="2">
-            <value>dayu_003</value>
+            <value></value>
         </constructor-arg>
     </bean>
 
+    <bean id="sampleWorkerRec1" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive"
+          init-method="consumerQueueMessage">
+        <constructor-arg index="0">
+            <ref bean="rabbitConnectionFactory"/>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="sampleMessageLitener"/>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <value></value>
+        </constructor-arg>
+    </bean>
 
     <bean id="sampleWorker2Rec" class="com.asura.framework.rabbitmq.receive.RabbitMqReceive"
           init-method="consumerQueueMessage">
