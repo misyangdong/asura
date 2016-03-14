@@ -31,7 +31,7 @@ public class T_QueueName {
     @Test
     public void getQueueName(){
         QueueName nameKey = new QueueName("s","m","f");
-        Assert.assertEquals(nameKey.getQueueName(),"s_m_f");
+        Assert.assertEquals(nameKey.getName(),"s_m_f");
     }
 
     @Test

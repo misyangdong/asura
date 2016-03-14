@@ -31,31 +31,31 @@ public class T_BindingKey {
     @Test
     public void getBindingKey(){
         BindingKey nameKey = new BindingKey("s","m","f");
-        Assert.assertEquals(nameKey.getBindingKey(), "s.m.f");
+        Assert.assertEquals(nameKey.getKey(), "s.m.f");
     }
 
     @Test
     public void getBindingKey1(){
         BindingKey nameKey = new BindingKey("","","");
-        Assert.assertEquals(nameKey.getBindingKey(), "*.*.*");
+        Assert.assertEquals(nameKey.getKey(), "*.*.*");
     }
 
     @Test
     public void getBindingKey2(){
         BindingKey nameKey = new BindingKey("s","","");
-        Assert.assertEquals(nameKey.getBindingKey(), "s.*.*");
+        Assert.assertEquals(nameKey.getKey(), "s.*.*");
     }
 
     @Test
     public void getBindingKey3(){
         BindingKey nameKey = new BindingKey("s","m","");
-        Assert.assertEquals(nameKey.getBindingKey(), "s.m.*");
+        Assert.assertEquals(nameKey.getKey(), "s.m.*");
     }
 
     @Test
     public void getBindingKey4(){
         BindingKey nameKey = new BindingKey("s","","f");
-        Assert.assertEquals(nameKey.getBindingKey(), "s.*.f");
+        Assert.assertEquals(nameKey.getKey(), "s.*.f");
     }
 
 }

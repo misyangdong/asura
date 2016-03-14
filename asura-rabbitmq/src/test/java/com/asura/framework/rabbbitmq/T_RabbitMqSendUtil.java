@@ -10,6 +10,9 @@ package com.asura.framework.rabbbitmq;
 
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
+import com.asura.framework.rabbitmq.entity.ExchangeName;
+import com.asura.framework.rabbitmq.entity.QueueName;
+import com.asura.framework.rabbitmq.entity.RoutingKey;
 import com.asura.framework.rabbitmq.send.RabbitMqSendClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,11 +33,17 @@ import org.junit.Test;
 public class T_RabbitMqSendUtil {
 
     RabbitConnectionFactory connectionFactory;
+    QueueName queueName = null;
+    RoutingKey routingKey = null;
+    ExchangeName exchangeName = null;
 
     @Before
     public void testBefore(){
         connectionFactory = new RabbitConnectionFactory();
         connectionFactory.init();
+        queueName = new QueueName("LSQ","QUEUE","02");
+        routingKey = new RoutingKey("sss","mmm","fff");
+        exchangeName = new ExchangeName("s","m","f");
     }
 
     @Test
@@ -47,7 +56,7 @@ public class T_RabbitMqSendUtil {
             if(s.length()<2048) {
                 s += i;
             }
-            client.sendQueue("LSQ_QUEUE_02", "HELLO WORLD +" +s);
+            client.sendQueue(queueName, "HELLO WORLD +" +s);
         }
     }
 
@@ -61,7 +70,7 @@ public class T_RabbitMqSendUtil {
             if(s.length()<2048) {
                 s += i;
             }
-            client.sendQueue("LSQ_QUEUE_03", "HELLO WORLD +" +s);
+            client.sendQueue(queueName, "HELLO WORLD +" +s);
         }
     }
 
@@ -75,17 +84,16 @@ public class T_RabbitMqSendUtil {
             if(s.length()<2048) {
                 s += i;
             }
-            String routingKey = "";
             if(i%3==1){
-                routingKey = "bbb";
+                routingKey.setSystem("aaa");
             }
             if(i%3==2){
-                routingKey = "ddd";
+                routingKey.setSystem("bbb");
             }
             if(i%3==0){
-                routingKey = "xxx";
+                routingKey.setSystem("ccc");
             }
-            client.sendTopic("LSQ_EXCHANGE_D_01",routingKey , PublishSubscribeType.DIRECT,"hello world "+i);
+            client.sendTopic(exchangeName,routingKey , PublishSubscribeType.DIRECT,"hello world "+i);
             System.out.println(i);
         }
     }

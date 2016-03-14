@@ -31,7 +31,7 @@ public class T_RoutingKey {
     @Test
     public void getRoutingKey(){
         RoutingKey routingKey = new RoutingKey("s","m","f");
-        Assert.assertEquals(routingKey.getRoutingKey(), "s.m.f");
+        Assert.assertEquals(routingKey.getKey(), "s.m.f");
     }
 
     @Test

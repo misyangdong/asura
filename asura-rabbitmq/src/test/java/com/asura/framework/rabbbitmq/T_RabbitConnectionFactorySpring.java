@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbbitmq;
 
+import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.send.RabbitMqSendClient;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,8 +46,9 @@ public class T_RabbitConnectionFactorySpring {
 
     @Test
     public void testSendQueue2()throws Exception {
+
         while(true) {
-            rabbitSendClient.sendQueue("LSQ_QUEUE_02", "HELLO WORLD +");
+            rabbitSendClient.sendQueue( new QueueName("LSQ","QUEUE","02"), "HELLO WORLD +");
         }
     }
 

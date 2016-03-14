@@ -11,6 +11,7 @@ package com.asura.framework.rabbitmq.receive.topic;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.BindingKey;
+import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.*;
@@ -39,22 +40,22 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
-                                 BindingKey bindingKey, String exchangeName) {
+                                 BindingKey bindingKey, ExchangeName exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
-                                 BindingKey bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+                                 BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, publishSubscribeType);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
-                                 QueueName queueName, BindingKey bindingKey, String exchangeName) {
+                                 QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
-                                 QueueName queueName, BindingKey bindingKey, String exchangeName, PublishSubscribeType publishSubscribeType) {
+                                 QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, publishSubscribeType);
     }
 
@@ -67,7 +68,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
     @Override
     public void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException {
         Channel channel = connection.createChannel();
-        channel.exchangeDeclare(this.getExchangeName(), this.getPublishSubscribeType().getName(), true);
+        channel.exchangeDeclare(this.getExchangeName().getName(), this.getPublishSubscribeType().getName(), true);
         String qName = null;
         if(this.getQueueName() ==null){
             qName = channel.queueDeclare().getQueue();
@@ -75,7 +76,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
             qName = this.getQueueName().getName();
             channel.queueDeclare(qName ,true,false,false,null);
         }
-        channel.queueBind(qName, this.getExchangeName(), this.getBindingKey().getKey());
+        channel.queueBind(qName, this.getExchangeName().getName(), this.getBindingKey().getKey());
         QueueingConsumer consumer = new QueueingConsumer(channel);
         channel.basicConsume(qName ,false,consumer);
         while(true){
