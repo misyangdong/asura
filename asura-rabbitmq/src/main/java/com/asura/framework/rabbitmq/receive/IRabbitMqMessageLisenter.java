@@ -27,7 +27,7 @@ import com.rabbitmq.client.QueueingConsumer.Delivery;
  * @since 1.0
  * @version 1.0
  */
-public interface IRabbitMqMessageLisenter {
+public interface IRabbitMqMessageLisenter{
 
 	/**
 	 * 接口方法实现消息的处理
