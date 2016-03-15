@@ -42,6 +42,11 @@ public class RabbitMessage extends BaseEntity{
 	 * 消息类型
 	 */
 	private String type;
+
+	/**
+	 * 消息操作
+	 */
+	private String method;
 	
 	/**
 	 * 发送时间串
@@ -89,6 +94,20 @@ public class RabbitMessage extends BaseEntity{
 	public void setSendTimeStr(String sendTimeStr) {
 		this.sendTimeStr = sendTimeStr;
 	}
-	
 
+	/**
+	 *
+	 * @return
+	 */
+	public String getMethod() {
+		return method;
+	}
+
+	/**
+	 *
+	 * @param method
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
 }
