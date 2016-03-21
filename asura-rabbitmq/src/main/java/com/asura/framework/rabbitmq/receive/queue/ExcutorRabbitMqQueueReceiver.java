@@ -44,16 +44,19 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
     public ExcutorRabbitMqQueueReceiver(){
         super();
+        poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,QueueName queueName) {
         super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
+        poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, int poolSize, QueueName queueName) {
         super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
+        this.poolSize = poolSize;
         executorService = Executors.newFixedThreadPool(poolSize);
     }
 
