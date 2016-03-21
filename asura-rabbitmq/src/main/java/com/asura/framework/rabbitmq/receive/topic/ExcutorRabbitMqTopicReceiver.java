@@ -45,42 +45,49 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
 
     public ExcutorRabbitMqTopicReceiver() {
         super();
+        poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName,bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        this.poolSize = poolSize;
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, publishSubscribeType);
+        this.poolSize = poolSize;
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         BindingKey bindingKey, ExchangeName exchangeName) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners, null,bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         BindingKey bindingKey, ExchangeName exchangeName, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        this.poolSize = poolSize;
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     public ExcutorRabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                         BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType, int poolSize) {
         super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, publishSubscribeType);
+        this.poolSize = poolSize;
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
