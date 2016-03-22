@@ -73,7 +73,7 @@ public class RabbitConnectionFactory {
 	 *
 	 */
 	public void init() {
-		initialize("rabbit.propertes");
+		initialize("rabbit.properties");
 	}
 
 	/**
