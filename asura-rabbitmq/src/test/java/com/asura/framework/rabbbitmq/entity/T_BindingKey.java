@@ -30,8 +30,8 @@ public class T_BindingKey {
 
     @Test
     public void getBindingKey(){
-        BindingKey nameKey = new BindingKey("s","m","f");
-        Assert.assertEquals(nameKey.getKey(), "s.m.f");
+        BindingKey nameKey = new WBindKey("s","m","b","f");
+        Assert.assertEquals(nameKey.getKey(), "s.m.b.f");
     }
 
     @Test

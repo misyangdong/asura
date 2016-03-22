@@ -1,8 +1,8 @@
 /**
- * @FileName: SampleMessageLitener.java
- * @Package: com.asura.framework.rabbbitmq
+ * @FileName: TopicMessageListener.java
+ * @Package: com.asura.framework.rabbbitmq.entity
  * @author sence
- * @created 3/14/2016 9:07 PM
+ * @created 3/16/2016 5:09 PM
  * <p/>
  * Copyright 2015 ziroom
  */
@@ -24,11 +24,11 @@ import com.rabbitmq.client.QueueingConsumer;
  * @since 1.0
  * @version 1.0
  */
-public class SampleMessageLitener implements IRabbitMqMessageLisenter {
-
+public class TopicMessageListener implements IRabbitMqMessageLisenter{
 
     @Override
     public void processMessage(QueueingConsumer.Delivery delivery) {
         System.out.println("["+ delivery.getEnvelope().getRoutingKey()+"][receive:"+new String(delivery.getBody())+"]");
     }
+
 }

@@ -172,7 +172,7 @@ public class RabbitConnectionFactory {
 		if (Check.NuNStr(cfg.getStringProperty(rabbit_server))) {
 			flag = false;
 			String msg_error = "rabbit.server配置不能为空值!!!!";
-			System.out.println(msg_error);
+		//	System.out.println(msg_error);
 			logger.error(msg_error);
 			return flag;
 		}
@@ -180,7 +180,7 @@ public class RabbitConnectionFactory {
 		if (cfg.getIntProperty(rabbit_server_port) == 0) {
 			flag = false;
 			String msg_error = "rabbit.server.port配置不能为空值!!!!";
-			System.out.println(msg_error);
+		//	System.out.println(msg_error);
 			logger.error(msg_error);
 			return flag;
 		}
@@ -188,7 +188,7 @@ public class RabbitConnectionFactory {
 		if (Check.NuNStr(cfg.getStringProperty(rabbit_server_username))) {
 			flag = false;
 			String msg_error = "rabbit.server.username配置不能为空值!!!!";
-			System.out.println(msg_error);
+		//	System.out.println(msg_error);
 			logger.error(msg_error);
 			return flag;
 		}
@@ -196,7 +196,7 @@ public class RabbitConnectionFactory {
 		if (Check.NuNStr(cfg.getStringProperty(rabbit_server_password))) {
 			flag = false;
 			String msg_error = "rabbit.server.password配置不能为空值!!!!";
-			System.out.println(msg_error);
+		//	System.out.println(msg_error);
 			logger.error(msg_error);
 			return flag;
 		}
@@ -265,7 +265,7 @@ public class RabbitConnectionFactory {
 	 */
 	public void closeConnection() throws IOException {
 		if (connection != null) {
-			System.out.println("mq connection factory close connection");
+		//	System.out.println("mq connection factory close connection");
 			connection.close();
 		}
 	}

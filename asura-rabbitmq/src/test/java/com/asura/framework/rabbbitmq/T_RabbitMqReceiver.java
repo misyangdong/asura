@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbbitmq;
 
+import com.asura.framework.rabbbitmq.entity.WBindKey;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.BindingKey;
@@ -79,7 +80,8 @@ public class T_RabbitMqReceiver {
         List<IRabbitMqMessageLisenter> lisenterList = new ArrayList<>();
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
-        rabbitMqReceiver.setBindingKey(new BindingKey("aaa", "mmm", "fff"));
+        rabbitMqReceiver.setBindingKey(new WBindKey("aaa", "mmm", "bbb", "fff"));
+        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TOPIC", "03"));
         rabbitMqReceiver.setExchangeName(new ExchangeName("s", "m", "f"));
         rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.DIRECT);
         rabbitMqReceiver.receiveMessage();
@@ -96,10 +98,10 @@ public class T_RabbitMqReceiver {
         List<IRabbitMqMessageLisenter> lisenterList = new ArrayList<>();
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
-        rabbitMqReceiver.setBindingKey(new BindingKey("bbb", "mmm", "fff"));
-        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "QUEUE", "02"));
-        rabbitMqReceiver.setExchangeName(new ExchangeName("s", "m", "f"));
-        rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.DIRECT);
+        rabbitMqReceiver.setBindingKey(new WBindKey("aaa", "*","*", "*"));
+        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TOPIC", "02"));
+        rabbitMqReceiver.setExchangeName(new ExchangeName("ss", "m", "f"));
+        rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.TOPIC);
         rabbitMqReceiver.receiveMessage();
     }
 

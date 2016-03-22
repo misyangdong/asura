@@ -8,7 +8,8 @@ rabbit.server.username=sms_rabbit_write
 rabbit.server.password=sms_rabbit_write
 # 客户端自动连接标识.为true,rabbitmq服务端重启后客户端会自动重连；客户端重启或者网断重连后会自动重连
 rabbit.server.automatic_recovery_enabled=true
-
+#环境
+rabbit.server.profile=d
 
 
 

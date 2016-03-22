@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbbitmq;
 
+import com.asura.framework.rabbbitmq.entity.WRoutingKey;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.ExchangeName;
@@ -42,8 +43,8 @@ public class T_RabbitMqSendUtil {
         connectionFactory = new RabbitConnectionFactory();
         connectionFactory.init();
         queueName = new QueueName("LSQ","QUEUE","02");
-        routingKey = new RoutingKey("sss","mmm","fff");
-        exchangeName = new ExchangeName("s","m","f");
+        routingKey = new WRoutingKey("sss","mmm","bbb","fff");
+        exchangeName = new ExchangeName("ss","m","f");
     }
 
     @Test
@@ -76,6 +77,7 @@ public class T_RabbitMqSendUtil {
 
     @Test
     public void testSendTopic() throws Exception {
+        ExchangeName exchangeName = new ExchangeName("ss","m","f");
         RabbitMqSendClient client = new RabbitMqSendClient();
         client.setRabbitConnectionFactory(connectionFactory);
         int i =0;
@@ -93,7 +95,7 @@ public class T_RabbitMqSendUtil {
             if(i%3==0){
                 routingKey.setSystem("ccc");
             }
-            client.sendTopic(exchangeName,routingKey , PublishSubscribeType.DIRECT,"hello world "+i);
+            client.sendTopic(exchangeName,routingKey , PublishSubscribeType.TOPIC,"hello world "+i);
             System.out.println(i);
         }
     }

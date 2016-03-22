@@ -83,7 +83,6 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             for(IRabbitMqMessageLisenter lisenter:super.getRabbitMqMessageLiteners()){
                 lisenter.processMessage(delivery);
-                //TODO
             }
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
         }
