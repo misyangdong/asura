@@ -15,6 +15,8 @@ import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,6 +38,7 @@ import java.util.concurrent.Executors;
  */
 public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExcutorRabbitMqTopicReceiver.class);
     /**
      *
      */
@@ -92,9 +95,9 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
     }
 
     @Override
-    public void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException {
+    public void doConsumeTopicMessage(Connection connection,String environment) throws IOException, InterruptedException {
         for(int size = 0;size<this.getPoolSize();size++) {
-            this.executorService.submit(new ConsumeWorker(connection, getExchangeName(),getQueueName() ,getBindingKey(), getPublishSubscribeType().getName(), getRabbitMqMessageLiteners()));
+            this.executorService.submit(new ConsumeWorker(connection,environment, getExchangeName(),getQueueName() ,getBindingKey(), getPublishSubscribeType().getName(), getRabbitMqMessageLiteners()));
         }
     }
 
@@ -110,30 +113,34 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
 
         private String routingType;
 
+        private String environment;
+
         private List<IRabbitMqMessageLisenter> lisenters;
 
-        private ConsumeWorker(Connection connection, ExchangeName exchangeName, QueueName queueName,BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
+        private ConsumeWorker(Connection connection,String environment, ExchangeName exchangeName, QueueName queueName,BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
             this.bindingKey = bindingKey;
             this.exchangeName = exchangeName;
             this.routingType = routingType;
             this.connection = connection;
             this.lisenters = lisenters;
             this.queueName = queueName;
+            this.environment = environment;
         }
 
         @Override
         public void run() {
             try {
                 Channel channel = connection.createChannel();
-                channel.exchangeDeclare(exchangeName.getName(), routingType, true);
-                String qname = null;
+                String _exchangeName = exchangeName.getNameByEnvironment(environment);
+                channel.exchangeDeclare(_exchangeName, routingType, true);
+                String qname;
                 if(queueName == null){
                     qname = channel.queueDeclare().getQueue();
                 }else{
-                    qname = queueName.getName();
+                    qname = queueName.getNameByEnvironment(environment);
                     channel.queueDeclare(qname,true,false,false,null);
                 }
-                channel.queueBind(qname, exchangeName.getName(), bindingKey.getKey());
+                channel.queueBind(qname, _exchangeName, bindingKey.getKey());
                 QueueingConsumer consumer = new QueueingConsumer(channel);
                 channel.basicConsume(qname, false, consumer);
                 while(true){
@@ -144,7 +151,7 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("rabbmitmq consumer error:", e);
             }
 
         }

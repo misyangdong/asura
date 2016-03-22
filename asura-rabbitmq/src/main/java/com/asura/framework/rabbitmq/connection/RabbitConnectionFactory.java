@@ -54,6 +54,8 @@ public class RabbitConnectionFactory {
 
 	public static final String rabbit_server_automatic_recovery_enabled = "rabbit.server.automatic_recovery_enabled";
 
+	public static final String rabbit_server_env = "rabbit.server.env";
+
 	private PropertiesParser cfg;
 
 	private String propSrc = null;
@@ -203,6 +205,16 @@ public class RabbitConnectionFactory {
 		return flag;
 	}
 
+	/**
+	 * 获取系统所处的环境
+	 * @return
+	 */
+	public String getEnvironment(){
+		if (Check.NuNStr(cfg.getStringProperty(rabbit_server_env))) {
+			return null;
+		}
+		return cfg.getStringProperty(rabbit_server_env);
+	}
 	/**
 	 * 
 	 * 获取连接

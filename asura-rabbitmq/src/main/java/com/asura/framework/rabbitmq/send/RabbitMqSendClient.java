@@ -15,6 +15,7 @@ import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.entity.RabbitMessage;
 import com.asura.framework.rabbitmq.entity.RoutingKey;
+import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMqSendClient {
 
-    private final static Logger logger = LoggerFactory.getLogger(RabbitMqSendClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RabbitMqSendClient.class);
 
     private RabbitConnectionFactory rabbitConnectionFactory;
 
@@ -47,7 +48,12 @@ public class RabbitMqSendClient {
 
     private Channel topicChannel;
 
+    private String environment;
+
     public Channel initQueueChannel() throws Exception {
+        if(rabbitConnectionFactory == null){
+            throw new AsuraRabbitMqException("send client not set rabbit connection factory");
+        }
         if (queueChannel == null) {
             synchronized (this) {
                 if (queueChannel == null) {
@@ -60,6 +66,9 @@ public class RabbitMqSendClient {
     }
 
     public Channel initTopicChannel() throws Exception {
+        if(rabbitConnectionFactory == null){
+            throw new AsuraRabbitMqException("send client not set rabbit connection factory");
+        }
         if (topicChannel == null) {
             synchronized (this) {
                 if (topicChannel == null) {
@@ -85,6 +94,7 @@ public class RabbitMqSendClient {
     public void setRabbitConnectionFactory(
             RabbitConnectionFactory rabbitConnectionFactory) {
         this.rabbitConnectionFactory = rabbitConnectionFactory;
+        this.environment = rabbitConnectionFactory.getEnvironment();
     }
 
     /**
@@ -102,9 +112,9 @@ public class RabbitMqSendClient {
         try {
             RabbitMessage rm = new RabbitMessage();
             rm.setData(msg);
-            rm.setType(queueName.getName());
-            queueChannel.queueDeclare(queueName.getName(), true, false, false, null);
-            queueChannel.basicPublish("", queueName.getName(), MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
+            rm.setType(queueName.getNameByEnvironment(environment));
+            queueChannel.queueDeclare(queueName.getNameByEnvironment(environment), true, false, false, null);
+            queueChannel.basicPublish("", queueName.getNameByEnvironment(environment), MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = queueName + "  rabbitmq发送消息异常";
             throw new BusinessException(err, e);
@@ -127,9 +137,9 @@ public class RabbitMqSendClient {
         try {
             RabbitMessage rm = new RabbitMessage();
             rm.setData(msg);
-            rm.setType(exchangeName.getName());
-            topicChannel.exchangeDeclare(exchangeName.getName(), type.getName(),true);
-            topicChannel.basicPublish(exchangeName.getName(), routingKey.getKey(), null, rm.toJsonStr().getBytes());
+            rm.setType(exchangeName.getNameByEnvironment(environment));
+            topicChannel.exchangeDeclare(exchangeName.getNameByEnvironment(environment), type.getName(),true);
+            topicChannel.basicPublish(exchangeName.getNameByEnvironment(environment), routingKey.getKey(), null, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = exchangeName + "  rabbitmq发送消息异常";
             throw new BusinessException(err, e);

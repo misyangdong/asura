@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbitmq.entity;
 
+import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
 /**

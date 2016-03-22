@@ -16,6 +16,8 @@ import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(RabbitMqQueueReceiver.class);
 
     /**
      *
@@ -61,18 +64,51 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
      * @throws InterruptedException
      */
     @Override
-    protected void doConsumeQueueMessage(Connection connection) throws IOException, InterruptedException {
-        Channel channel = connection.createChannel();
-        channel.queueDeclare(this.getQueueName().getName(), true, false, false, null);
-        channel.basicQos(1);
-        QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(this.getQueueName().getName(),false,consumer);
-        while(true){
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            for(IRabbitMqMessageLisenter lisenter:super.getRabbitMqMessageLiteners()){
-                lisenter.processMessage(delivery);
+    protected void doConsumeQueueMessage(Connection connection,String environment) throws IOException, InterruptedException {
+        new Thread(new ConsumeWorker(this.getQueueName(), connection, environment ,this.getRabbitMqMessageLiteners())).start();
+
+    }
+
+    private class ConsumeWorker implements Runnable{
+
+        private QueueName queueName;
+
+        private Connection connection;
+
+        private List<IRabbitMqMessageLisenter> lisenters;
+
+        private String enviroment;
+
+        private ConsumeWorker(QueueName queueName,Connection connection,String environment,List<IRabbitMqMessageLisenter> lisenters){
+            this.queueName = queueName;
+            this.connection = connection;
+            this.lisenters = lisenters;
+            this.enviroment = environment;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if(queueName == null){
+                    throw new BusinessException("queueName not set");
+                }
+                Channel channel = connection.createChannel();
+                String _queueName =  queueName.getNameByEnvironment(enviroment);
+                channel.queueDeclare(_queueName, true, false, false, null);
+                QueueingConsumer consumer = new QueueingConsumer(channel);
+                channel.basicQos(1);
+                channel.basicConsume(_queueName,false,consumer);
+                while(true){
+                    QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    for(IRabbitMqMessageLisenter lisenter:lisenters){
+                        lisenter.processMessage(delivery);
+                    }
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+                }
+            }catch (Exception e){
+                LOGGER.error("rabbmitmq consumer error:",e);
             }
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+
         }
     }
 

@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbbitmq.entity;
 
+import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.entity.RoutingKey;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
@@ -61,5 +62,4 @@ public class WRoutingKey extends RoutingKey {
         }
         return getSystem()+"."+getModule()+"."+getBiz()+"."+getFunction();
     }
-
 }

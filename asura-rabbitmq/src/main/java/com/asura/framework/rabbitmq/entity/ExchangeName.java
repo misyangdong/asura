@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbitmq.entity;
 
+import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
 /**
@@ -49,4 +50,16 @@ public class ExchangeName extends QueueName {
         return "EX_"+getSystem()+"_"+getModule()+"_"+getFunction();
     }
 
+    /**
+     * 根据环境获取到Name
+     * @param environment
+     * @return
+     * @throws AsuraRabbitMqException
+     */
+    public String getNameByEnvironment(String environment) throws AsuraRabbitMqException {
+        if(Check.NuNStr(environment)){
+            return getName();
+        }
+        return environment+"."+getName();
+    }
 }

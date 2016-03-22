@@ -68,7 +68,7 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
     }
 
     @Override
-    public void doConsumeMessage(Connection connection) throws IOException, InterruptedException{
+    public void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException{
         if (this.getBindingKey() == null) {
             throw new BusinessException("bindingKey not set");
         }
@@ -78,10 +78,10 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
         if (this.getPublishSubscribeType() == null) {
             throw new BusinessException("publishSubscribeType not set");
         }
-        doConsumeTopicMessage(connection);
+        doConsumeTopicMessage(connection,environment);
     }
 
-    protected abstract void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException;
+    protected abstract void doConsumeTopicMessage(Connection connection,String environment) throws IOException, InterruptedException;
 
     public QueueName getQueueName() {
         return queueName;

@@ -66,18 +66,20 @@ public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
          * This way you can use as many (virtual) connections as you want inside your application without overloading the broker with TCP connections
          */
         Connection connection = rabbitConnectionFactory.getConnection();
-        doConsumeMessage(connection);
+        doConsumeMessage(connection,rabbitConnectionFactory.getEnvironment());
     }
 
     /**
      * 使用单个Connection 来实现消费
      * @param connection
      */
-    protected abstract void doConsumeMessage(Connection connection) throws IOException, InterruptedException;
+    protected abstract void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException;
 
     public void setRabbitConnectionFactory(RabbitConnectionFactory rabbitConnectionFactory) {
         this.rabbitConnectionFactory = rabbitConnectionFactory;
     }
+
+
 
     public List<IRabbitMqMessageLisenter> getRabbitMqMessageLiteners() {
         return rabbitMqMessageLiteners;

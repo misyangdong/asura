@@ -67,7 +67,7 @@ public class T_RabbitMqReceiver {
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
         rabbitMqReceiver.receiveMessage();
-        Thread.sleep(1000000);
+        Thread.sleep(5000);
     }
 
     @Test
@@ -81,10 +81,11 @@ public class T_RabbitMqReceiver {
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
         rabbitMqReceiver.setBindingKey(new WBindKey("aaa", "mmm", "bbb", "fff"));
-        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TOPIC", "03"));
-        rabbitMqReceiver.setExchangeName(new ExchangeName("s", "m", "f"));
-        rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.DIRECT);
+        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TOPIC", "04"));
+        rabbitMqReceiver.setExchangeName(new ExchangeName("ss", "m", "f"));
+        rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.TOPIC);
         rabbitMqReceiver.receiveMessage();
+        Thread.sleep(10000);
     }
 
 

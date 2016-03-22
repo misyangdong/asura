@@ -33,6 +33,7 @@ import java.util.List;
  */
 public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiver {
 
+
     private QueueName queueName;
 
     public AbstractRabbitQueueReceiver() {
@@ -45,14 +46,14 @@ public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiv
     }
 
     @Override
-    protected void doConsumeMessage(Connection connection) throws IOException, InterruptedException {
+    protected void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException {
         if(queueName == null){
             throw new BusinessException("queueName not set");
         }
-        doConsumeQueueMessage(connection);
+        doConsumeQueueMessage(connection,environment);
     }
 
-    protected abstract void doConsumeQueueMessage(Connection connection)throws IOException, InterruptedException;
+    protected abstract void doConsumeQueueMessage(Connection connection,String environment)throws IOException, InterruptedException;
 
     public QueueName getQueueName() {
         return queueName;

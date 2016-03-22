@@ -15,6 +15,8 @@ import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.List;
  */
 public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(RabbitMqTopicReceiver.class);
 
     public RabbitMqTopicReceiver() {
 
@@ -66,25 +69,64 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
      * @throws InterruptedException
      */
     @Override
-    public void doConsumeTopicMessage(Connection connection) throws IOException, InterruptedException {
-        Channel channel = connection.createChannel();
-        channel.exchangeDeclare(this.getExchangeName().getName(), this.getPublishSubscribeType().getName(), true);
-        String qName = null;
-        if(this.getQueueName() ==null){
-            qName = channel.queueDeclare().getQueue();
-        }else{
-            qName = this.getQueueName().getName();
-            channel.queueDeclare(qName ,true,false,false,null);
+    public void doConsumeTopicMessage(Connection connection,String environment) throws IOException, InterruptedException {
+        ConsumeWorker consumeWorker = new ConsumeWorker(connection,environment, getExchangeName(),getQueueName() ,getBindingKey(), getPublishSubscribeType().getName(), getRabbitMqMessageLiteners());
+        new Thread(consumeWorker).start();
+    }
+
+    private class ConsumeWorker implements Runnable {
+
+        private QueueName queueName;
+
+        private Connection connection;
+
+        private ExchangeName exchangeName;
+
+        private BindingKey bindingKey;
+
+        private String routingType;
+
+        private String environment;
+
+        private List<IRabbitMqMessageLisenter> lisenters;
+
+        private ConsumeWorker(Connection connection,String environment, ExchangeName exchangeName, QueueName queueName,BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
+            this.bindingKey = bindingKey;
+            this.exchangeName = exchangeName;
+            this.routingType = routingType;
+            this.connection = connection;
+            this.lisenters = lisenters;
+            this.queueName = queueName;
+            this.environment = environment;
         }
-        channel.queueBind(qName, this.getExchangeName().getName(), this.getBindingKey().getKey());
-        QueueingConsumer consumer = new QueueingConsumer(channel);
-        channel.basicConsume(qName ,false,consumer);
-        while(true){
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            for(IRabbitMqMessageLisenter lisenter:super.getRabbitMqMessageLiteners()){
-                lisenter.processMessage(delivery);
+
+        @Override
+        public void run() {
+            try {
+                Channel channel = connection.createChannel();
+                String _exchangeName = exchangeName.getNameByEnvironment(environment);
+                channel.exchangeDeclare(_exchangeName, routingType, true);
+                String qname;
+                if(queueName == null){
+                    qname = channel.queueDeclare().getQueue();
+                }else{
+                    qname = queueName.getNameByEnvironment(environment);
+                    channel.queueDeclare(qname,true,false,false,null);
+                }
+                channel.queueBind(qname, _exchangeName, bindingKey.getKey());
+                QueueingConsumer consumer = new QueueingConsumer(channel);
+                channel.basicConsume(qname, false, consumer);
+                while(true){
+                    QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    for(IRabbitMqMessageLisenter lisenter:lisenters){
+                        lisenter.processMessage(delivery);
+                    }
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+                }
+            } catch (Exception e) {
+                LOGGER.error("rabbmitmq consumer error:", e);
             }
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+
         }
     }
 

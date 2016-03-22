@@ -8,6 +8,7 @@
  */
 package com.asura.framework.rabbbitmq.entity;
 
+import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.entity.BindingKey;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
@@ -63,5 +64,4 @@ public class WBindKey extends BindingKey{
         }
         return getSystem()+"."+getModule()+"."+getBiz()+"."+getFunction();
     }
-
 }
