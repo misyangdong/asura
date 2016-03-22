@@ -8,12 +8,12 @@
  */
 package com.asura.framework.rabbitmq.receive.topic;
 
-import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.BindingKey;
 import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
+import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Connection;
@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -31,8 +31,8 @@ import java.util.List;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqReceiver {
 
@@ -54,7 +54,7 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
     private PublishSubscribeType publishSubscribeType;
 
 
-    public AbstractRabbitMqTopicReceiver(){
+    public AbstractRabbitMqTopicReceiver() {
         super();
     }
 
@@ -68,20 +68,20 @@ public abstract class AbstractRabbitMqTopicReceiver extends AbstractRabbitMqRece
     }
 
     @Override
-    public void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException{
+    public void doConsumeMessage(Connection connection, String environment) throws IOException, InterruptedException {
         if (this.getBindingKey() == null) {
-            throw new BusinessException("bindingKey not set");
+            throw new AsuraRabbitMqException("bindingKey not set");
         }
         if (this.getExchangeName() == null) {
-            throw new BusinessException("exchangeName not set");
+            throw new AsuraRabbitMqException("exchangeName not set");
         }
         if (this.getPublishSubscribeType() == null) {
-            throw new BusinessException("publishSubscribeType not set");
+            throw new AsuraRabbitMqException("publishSubscribeType not set");
         }
-        doConsumeTopicMessage(connection,environment);
+        doConsumeTopicMessage(connection, environment);
     }
 
-    protected abstract void doConsumeTopicMessage(Connection connection,String environment) throws IOException, InterruptedException;
+    protected abstract void doConsumeTopicMessage(Connection connection, String environment) throws IOException, InterruptedException;
 
     public QueueName getQueueName() {
         return queueName;

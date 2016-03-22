@@ -8,9 +8,9 @@
  */
 package com.asura.framework.rabbitmq.receive.queue;
 
-import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.QueueName;
+import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Connection;
@@ -48,7 +48,7 @@ public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiv
     @Override
     protected void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException {
         if(queueName == null){
-            throw new BusinessException("queueName not set");
+            throw new AsuraRabbitMqException("queueName not set");
         }
         doConsumeQueueMessage(connection,environment);
     }

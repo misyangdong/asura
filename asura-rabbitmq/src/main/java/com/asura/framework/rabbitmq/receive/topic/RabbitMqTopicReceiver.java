@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p></p>
@@ -102,8 +103,9 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
         @Override
         public void run() {
+            Channel channel = null;
             try {
-                Channel channel = connection.createChannel();
+                channel = connection.createChannel();
                 String _exchangeName = exchangeName.getNameByEnvironment(environment);
                 channel.exchangeDeclare(_exchangeName, routingType, true);
                 String qname;
@@ -124,6 +126,16 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
                 }
             } catch (Exception e) {
+                if(e instanceof ShutdownSignalException){
+                    try {
+                        channel.close();
+                        connection.close();
+                    } catch (IOException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    } catch (TimeoutException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    }
+                }
                 LOGGER.error("rabbmitmq consumer error:", e);
             }
 

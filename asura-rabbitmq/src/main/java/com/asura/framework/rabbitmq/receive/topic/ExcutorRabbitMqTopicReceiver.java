@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p>多线程消费</p>
@@ -129,8 +130,9 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
 
         @Override
         public void run() {
+            Channel channel = null;
             try {
-                Channel channel = connection.createChannel();
+                channel = connection.createChannel();
                 String _exchangeName = exchangeName.getNameByEnvironment(environment);
                 channel.exchangeDeclare(_exchangeName, routingType, true);
                 String qname;
@@ -151,6 +153,16 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
                 }
             } catch (Exception e) {
+                if(e instanceof ShutdownSignalException){
+                    try {
+                        channel.close();
+                        connection.close();
+                    } catch (IOException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    } catch (TimeoutException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    }
+                }
                 LOGGER.error("rabbmitmq consumer error:", e);
             }
 

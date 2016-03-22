@@ -8,7 +8,6 @@
  */
 package com.asura.framework.rabbitmq.send;
 
-import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.ExchangeName;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * <p>rabbitmq消息生产端</p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -35,8 +34,8 @@ import java.util.concurrent.TimeoutException;
  * </PRE>
  *
  * @author zhangshaobin
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class RabbitMqSendClient {
 
@@ -51,7 +50,7 @@ public class RabbitMqSendClient {
     private String environment;
 
     public Channel initQueueChannel() throws Exception {
-        if(rabbitConnectionFactory == null){
+        if (rabbitConnectionFactory == null) {
             throw new AsuraRabbitMqException("send client not set rabbit connection factory");
         }
         if (queueChannel == null) {
@@ -66,7 +65,7 @@ public class RabbitMqSendClient {
     }
 
     public Channel initTopicChannel() throws Exception {
-        if(rabbitConnectionFactory == null){
+        if (rabbitConnectionFactory == null) {
             throw new AsuraRabbitMqException("send client not set rabbit connection factory");
         }
         if (topicChannel == null) {
@@ -98,14 +97,12 @@ public class RabbitMqSendClient {
     }
 
     /**
-     *
      * 发送消息-queue方式
      *
+     * @param queueName 格式为：系统标示_模块标示_功能标示
+     * @param msg       具体消息
      * @author zhangshaobin
      * @created 2016年3月1日 下午4:39:23
-     *
-     * @param queueName 格式为：系统标示_模块标示_功能标示
-     * @param msg 具体消息
      */
     public void sendQueue(QueueName queueName, String msg) throws Exception {
         initQueueChannel();
@@ -117,32 +114,30 @@ public class RabbitMqSendClient {
             queueChannel.basicPublish("", queueName.getNameByEnvironment(environment), MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = queueName + "  rabbitmq发送消息异常";
-            throw new BusinessException(err, e);
+            throw new AsuraRabbitMqException(err, e);
         }
     }
 
 
     /**
-     *
      * 发送消息-topic方式
      *
+     * @param exchangeName 格式为：系统标示_模块标示_功能标示
+     * @param msg          具体消息
      * @author zhangshaobin
      * @created 2016年3月1日 下午4:40:59
-     *
-     * @param exchangeName 格式为：系统标示_模块标示_功能标示
-     * @param msg 具体消息
      */
-    public void sendTopic( ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
+    public void sendTopic(ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
         initTopicChannel();
         try {
             RabbitMessage rm = new RabbitMessage();
             rm.setData(msg);
             rm.setType(exchangeName.getNameByEnvironment(environment));
-            topicChannel.exchangeDeclare(exchangeName.getNameByEnvironment(environment), type.getName(),true);
+            topicChannel.exchangeDeclare(exchangeName.getNameByEnvironment(environment), type.getName(), true);
             topicChannel.basicPublish(exchangeName.getNameByEnvironment(environment), routingKey.getKey(), null, rm.toJsonStr().getBytes());
         } catch (Exception e) {
             String err = exchangeName + "  rabbitmq发送消息异常";
-            throw new BusinessException(err, e);
+            throw new AsuraRabbitMqException(err, e);
         }
     }
 

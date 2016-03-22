@@ -8,13 +8,12 @@
  */
 package com.asura.framework.rabbbitmq.entity;
 
-import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.entity.BindingKey;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -22,10 +21,10 @@ import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
-public class WBindKey extends BindingKey{
+public class WBindKey extends BindingKey {
 
     private String biz;
 
@@ -47,21 +46,19 @@ public class WBindKey extends BindingKey{
     }
 
 
-
-
     /**
      * 获取到routingKey
      */
     public String getKey() throws AsuraRabbitMqException {
-        if(this.getSystem()==null ||"".equals(this.getSystem())){
+        if (this.getSystem() == null || "".equals(this.getSystem())) {
             this.setSystem("*");
         }
-        if(this.getModule()==null || "".equals(this.getModule())){
+        if (this.getModule() == null || "".equals(this.getModule())) {
             this.setModule("*");
         }
-        if(this.getFunction()==null ||"".equals(this.getFunction())){
+        if (this.getFunction() == null || "".equals(this.getFunction())) {
             this.setFunction("*");
         }
-        return getSystem()+"."+getModule()+"."+getBiz()+"."+getFunction();
+        return getSystem() + "." + getModule() + "." + getBiz() + "." + getFunction();
     }
 }

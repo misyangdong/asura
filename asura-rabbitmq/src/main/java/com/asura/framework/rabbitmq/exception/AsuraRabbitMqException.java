@@ -37,4 +37,13 @@ public class AsuraRabbitMqException extends RuntimeException {
     public AsuraRabbitMqException(String message) {
         super(message);
     }
+
+    /**
+     *
+     * @param message
+     * @param cause
+     */
+    public AsuraRabbitMqException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

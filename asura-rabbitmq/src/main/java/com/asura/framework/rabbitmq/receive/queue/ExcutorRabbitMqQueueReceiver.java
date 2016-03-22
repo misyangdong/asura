@@ -8,14 +8,14 @@
  */
 package com.asura.framework.rabbitmq.receive.queue;
 
-import com.asura.framework.base.exception.BusinessException;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.QueueName;
-import com.asura.framework.rabbitmq.receive.AbstractRabbitMqReceiver;
+import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +23,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -34,8 +35,8 @@ import java.util.concurrent.Executors;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
@@ -46,32 +47,32 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
     private int poolSize;
 
-    public ExcutorRabbitMqQueueReceiver(){
+    public ExcutorRabbitMqQueueReceiver() {
         super();
         poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
-    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,QueueName queueName) {
-        super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
+    public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, QueueName queueName) {
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName);
         poolSize = 3;
         executorService = Executors.newFixedThreadPool(3);
     }
 
     public ExcutorRabbitMqQueueReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners, int poolSize, QueueName queueName) {
-        super(rabbitConnectionFactory,rabbitMqMessageLiteners,queueName);
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName);
         this.poolSize = poolSize;
         executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     @Override
-    protected void doConsumeQueueMessage(Connection connection,String environment){
-        for(int i = 0; i<poolSize;i++) {
-            this.executorService.submit(new ConsumeWorker(this.getQueueName(), connection, environment ,this.getRabbitMqMessageLiteners()));
+    protected void doConsumeQueueMessage(Connection connection, String environment) {
+        for (int i = 0; i < poolSize; i++) {
+            this.executorService.submit(new ConsumeWorker(this.getQueueName(), connection, environment, this.getRabbitMqMessageLiteners()));
         }
     }
 
-    private class ConsumeWorker implements Runnable{
+    private class ConsumeWorker implements Runnable {
 
         private QueueName queueName;
 
@@ -81,7 +82,7 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
         private String enviroment;
 
-        private ConsumeWorker(QueueName queueName,Connection connection,String environment,List<IRabbitMqMessageLisenter> lisenters){
+        private ConsumeWorker(QueueName queueName, Connection connection, String environment, List<IRabbitMqMessageLisenter> lisenters) {
             this.queueName = queueName;
             this.connection = connection;
             this.lisenters = lisenters;
@@ -90,25 +91,36 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
         @Override
         public void run() {
+            Channel channel = null;
             try {
-                if(queueName == null){
-                    throw new BusinessException("queueName not set");
+                if (queueName == null) {
+                    throw new AsuraRabbitMqException("queueName not set");
                 }
-                Channel channel = connection.createChannel();
-                String _queueName =  queueName.getNameByEnvironment(enviroment);
+                channel = connection.createChannel();
+                String _queueName = queueName.getNameByEnvironment(enviroment);
                 channel.queueDeclare(_queueName, true, false, false, null);
                 QueueingConsumer consumer = new QueueingConsumer(channel);
                 channel.basicQos(1);
-                channel.basicConsume(_queueName,false,consumer);
-                while(true){
+                channel.basicConsume(_queueName, false, consumer);
+                while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                    for(IRabbitMqMessageLisenter lisenter:lisenters){
+                    for (IRabbitMqMessageLisenter lisenter : lisenters) {
                         lisenter.processMessage(delivery);
                     }
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
-            }catch (Exception e){
-                LOGGER.error("rabbmitmq consumer error:",e);
+            } catch (Exception e) {
+                if(e instanceof ShutdownSignalException){
+                    try {
+                        channel.close();
+                        connection.close();
+                    } catch (IOException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    } catch (TimeoutException e1) {
+                        LOGGER.error("rabbmitmq close error:", e);
+                    }
+                }
+                LOGGER.error("rabbmitmq consumer error:", e);
             }
 
         }

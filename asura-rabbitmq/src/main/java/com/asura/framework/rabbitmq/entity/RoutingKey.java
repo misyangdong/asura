@@ -8,12 +8,11 @@
  */
 package com.asura.framework.rabbitmq.entity;
 
-import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -21,8 +20,8 @@ import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class RoutingKey extends NameKey {
 
@@ -38,16 +37,16 @@ public class RoutingKey extends NameKey {
      * 获取到routingKey
      */
     public String getKey() throws AsuraRabbitMqException {
-        if(this.getSystem()==null ||"".equals(this.getSystem())){
+        if (this.getSystem() == null || "".equals(this.getSystem())) {
             throw new AsuraRabbitMqException("RoutingKey:system is null");
         }
-        if(this.getModule()==null || "".equals(this.getModule())){
+        if (this.getModule() == null || "".equals(this.getModule())) {
             throw new AsuraRabbitMqException("RoutingKey:module is null");
         }
-        if(this.getFunction()==null ||"".equals(this.getFunction())){
+        if (this.getFunction() == null || "".equals(this.getFunction())) {
             throw new AsuraRabbitMqException("RoutingKey:function is null");
         }
-        return getSystem()+"."+getModule()+"."+getFunction();
+        return getSystem() + "." + getModule() + "." + getFunction();
     }
 
 }

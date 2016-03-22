@@ -8,12 +8,11 @@
  */
 package com.asura.framework.rabbitmq.entity;
 
-import com.asura.framework.base.util.Check;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -21,12 +20,12 @@ import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class QueueName extends NameKey {
 
-    public QueueName(){
+    public QueueName() {
 
     }
 
@@ -37,29 +36,30 @@ public class QueueName extends NameKey {
     /**
      *
      */
-    public String getName() throws AsuraRabbitMqException{
-        if(this.getSystem()==null ||"".equals(this.getSystem())){
+    public String getName() throws AsuraRabbitMqException {
+        if (this.getSystem() == null || "".equals(this.getSystem())) {
             throw new AsuraRabbitMqException("QueueName:system is null");
         }
-        if(this.getModule()==null || "".equals(this.getModule())){
+        if (this.getModule() == null || "".equals(this.getModule())) {
             throw new AsuraRabbitMqException("QueueName:module is null");
         }
-        if(this.getFunction()==null ||"".equals(this.getFunction())){
+        if (this.getFunction() == null || "".equals(this.getFunction())) {
             throw new AsuraRabbitMqException("QueueName:function is null");
         }
-        return getSystem()+"_"+getModule()+"_"+getFunction();
+        return getSystem() + "_" + getModule() + "_" + getFunction();
     }
 
     /**
      * 根据环境获取到Name
+     *
      * @param environment
      * @return
      * @throws AsuraRabbitMqException
      */
     public String getNameByEnvironment(String environment) throws AsuraRabbitMqException {
-        if(Check.NuNStr(environment)){
+        if (environment == null) {
             return getName();
         }
-        return environment+"."+getName();
+        return environment + "." + getName();
     }
 }
