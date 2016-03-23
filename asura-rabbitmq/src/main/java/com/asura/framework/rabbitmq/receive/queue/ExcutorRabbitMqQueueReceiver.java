@@ -104,6 +104,9 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 channel.basicConsume(_queueName, false, consumer);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    if(LOGGER.isInfoEnabled()) {
+                        LOGGER.info("CONSUMER TOPIC MESSAGE:[queue:{},message:{}]", _queueName, new String(delivery.getBody(), "UTF-8"));
+                    }
                     for (IRabbitMqMessageLisenter lisenter : lisenters) {
                         lisenter.processMessage(delivery);
                     }
@@ -115,12 +118,18 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                         channel.close();
                         connection.close();
                     } catch (IOException e1) {
-                        LOGGER.error("rabbmitmq close error:", e);
+                        if(LOGGER.isErrorEnabled()) {
+                            LOGGER.error("rabbmitmq close error:", e);
+                        }
                     } catch (TimeoutException e1) {
-                        LOGGER.error("rabbmitmq close error:", e);
+                        if(LOGGER.isErrorEnabled()) {
+                            LOGGER.error("rabbmitmq close error:", e);
+                        }
                     }
                 }
-                LOGGER.error("rabbmitmq consumer error:", e);
+                if(LOGGER.isErrorEnabled()) {
+                    LOGGER.error("rabbmitmq consumer error:", e);
+                }
             }
 
         }

@@ -15,6 +15,8 @@ import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.entity.RabbitMessage;
 import com.asura.framework.rabbitmq.entity.RoutingKey;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
@@ -105,16 +107,32 @@ public class RabbitMqSendClient {
      * @created 2016年3月1日 下午4:39:23
      */
     public void sendQueue(QueueName queueName, String msg) throws Exception {
+        Transaction trans = Cat.newTransaction("RabbitMQ message", "send queue");
         initQueueChannel();
+        String _queueName = queueName.getNameByEnvironment(environment);
+        Cat.logEvent("queue name",_queueName);
+        RabbitMessage rm = new RabbitMessage();
+        rm.setData(msg);
+        rm.setType(_queueName);
         try {
-            RabbitMessage rm = new RabbitMessage();
-            rm.setData(msg);
-            rm.setType(queueName.getNameByEnvironment(environment));
-            queueChannel.queueDeclare(queueName.getNameByEnvironment(environment), true, false, false, null);
-            queueChannel.basicPublish("", queueName.getNameByEnvironment(environment), MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
+            Cat.logEvent("send message", rm.toJsonStr());
+            queueChannel.queueDeclare(_queueName, true, false, false, null);
+            queueChannel.basicPublish("", _queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
+            if(LOGGER.isInfoEnabled()) {
+                LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _queueName, rm.toJsonStr());
+            }
+            Cat.logMetricForCount(_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
+            trans.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
+            if(LOGGER.isErrorEnabled()) {
+                LOGGER.error("SEND ERROR:[queue:{},message:{},exception:{}]", _queueName, rm.toJsonStr(), e);
+            }
             String err = queueName + "  rabbitmq发送消息异常";
+            Cat.logError(err, e);
+            trans.setStatus(e);
             throw new AsuraRabbitMqException(err, e);
+        }finally {
+            trans.complete();
         }
     }
 
@@ -128,16 +146,32 @@ public class RabbitMqSendClient {
      * @created 2016年3月1日 下午4:40:59
      */
     public void sendTopic(ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
+        Transaction trans = Cat.newTransaction("RabbitMQ message", "send topic");
         initTopicChannel();
+        String _exchange = exchangeName.getNameByEnvironment(environment);
+        RabbitMessage rm = new RabbitMessage();
+        rm.setData(msg);
+        rm.setType(_exchange);
         try {
-            RabbitMessage rm = new RabbitMessage();
-            rm.setData(msg);
-            rm.setType(exchangeName.getNameByEnvironment(environment));
-            topicChannel.exchangeDeclare(exchangeName.getNameByEnvironment(environment), type.getName(), true);
-            topicChannel.basicPublish(exchangeName.getNameByEnvironment(environment), routingKey.getKey(), null, rm.toJsonStr().getBytes());
+            Cat.logEvent("send message",rm.toJsonStr());
+            rm.setType(_exchange);
+            topicChannel.exchangeDeclare(_exchange, type.getName(), true);
+            topicChannel.basicPublish(_exchange, routingKey.getKey(), null, rm.toJsonStr().getBytes());
+            if(LOGGER.isInfoEnabled()) {
+                LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _exchange, rm.toJsonStr());
+            }
+            Cat.logMetricForCount(_exchange); // 统计请求次数, 可以查看对应队列中放入了多少信息
+            trans.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
+            if(LOGGER.isErrorEnabled()) {
+                LOGGER.error("SEND ERROR:[queue:{},message:{},exception:{}]", _exchange, rm.toJsonStr(), e);
+            }
             String err = exchangeName + "  rabbitmq发送消息异常";
+            Cat.logError(err, e);
+            trans.setStatus(e);
             throw new AsuraRabbitMqException(err, e);
+        }finally {
+            trans.complete();
         }
     }
 

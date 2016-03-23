@@ -147,8 +147,11 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
                 channel.basicConsume(qname, false, consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    if(LOGGER.isInfoEnabled()) {
+                        LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(), new String(delivery.getBody(), "UTF-8"));
+                    }
                     for(IRabbitMqMessageLisenter lisenter:lisenters){
-                            lisenter.processMessage(delivery);
+                        lisenter.processMessage(delivery);
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
                 }
@@ -158,12 +161,19 @@ public class ExcutorRabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver 
                         channel.close();
                         connection.close();
                     } catch (IOException e1) {
-                        LOGGER.error("rabbmitmq close error:", e);
+                        if(LOGGER.isErrorEnabled()) {
+                            LOGGER.error("rabbmitmq close error:", e);
+                        }
                     } catch (TimeoutException e1) {
-                        LOGGER.error("rabbmitmq close error:", e);
+                        if(LOGGER.isErrorEnabled()) {
+                            LOGGER.error("rabbmitmq close error:", e);
+                        }
                     }
                 }
-                LOGGER.error("rabbmitmq consumer error:", e);
+                if(LOGGER.isErrorEnabled()) {
+                    LOGGER.error("rabbmitmq consumer error:", e);
+                }
+
             }
 
         }
