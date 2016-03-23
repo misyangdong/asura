@@ -14,6 +14,8 @@ import com.asura.framework.rabbitmq.entity.BindingKey;
 import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +106,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
         @Override
         public void run() {
             Channel channel = null;
+            Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume topic");
             try {
                 channel = connection.createChannel();
                 String _exchangeName = exchangeName.getNameByEnvironment(environment);
@@ -126,7 +129,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                     for(IRabbitMqMessageLisenter lisenter:lisenters){
                         lisenter.processMessage(delivery);
                     }
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(),false);
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             } catch (Exception e) {
                 if(e instanceof ShutdownSignalException){

@@ -12,6 +12,8 @@ import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
@@ -88,6 +90,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
         @Override
         public void run() {
             Channel channel = null;
+            Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume queue");
             try {
                 if (queueName == null) {
                     throw new AsuraRabbitMqException("queueName not set");
@@ -103,6 +106,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     if(LOGGER.isInfoEnabled()) {
                         LOGGER.info("CONSUMER TOPIC MESSAGE:[queue:{},message:{}]", _queueName, new String(delivery.getBody(), "UTF-8"));
                     }
+
                     for (IRabbitMqMessageLisenter lisenter : lisenters) {
                         lisenter.processMessage(delivery);
                     }

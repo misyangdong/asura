@@ -33,6 +33,6 @@ public interface IRabbitMqMessageLisenter{
 	 * 接口方法实现消息的处理
 	 * @param delivery
 	 */
-	void processMessage(Delivery delivery);
+	void processMessage(Delivery delivery) throws Exception;
 
 }
