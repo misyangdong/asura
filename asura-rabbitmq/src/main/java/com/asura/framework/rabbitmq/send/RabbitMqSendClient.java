@@ -117,7 +117,7 @@ public class RabbitMqSendClient {
         try {
             Cat.logEvent("send message", rm.toJsonStr());
             queueChannel.queueDeclare(_queueName, true, false, false, null);
-            queueChannel.basicPublish("", _queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes());
+            queueChannel.basicPublish("", _queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes("UTF-8"));
             if(LOGGER.isInfoEnabled()) {
                 LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _queueName, rm.toJsonStr());
             }
@@ -156,7 +156,7 @@ public class RabbitMqSendClient {
             Cat.logEvent("send message",rm.toJsonStr());
             rm.setType(_exchange);
             topicChannel.exchangeDeclare(_exchange, type.getName(), true);
-            topicChannel.basicPublish(_exchange, routingKey.getKey(), null, rm.toJsonStr().getBytes());
+            topicChannel.basicPublish(_exchange, routingKey.getKey(), null, rm.toJsonStr().getBytes("UTF-8"));
             if(LOGGER.isInfoEnabled()) {
                 LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _exchange, rm.toJsonStr());
             }
