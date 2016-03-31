@@ -109,33 +109,13 @@ public class RabbitMqSendClient {
      * @created 2016年3月1日 下午4:39:23
      */
     public void sendQueue(QueueName queueName, String msg) throws Exception {
-        Transaction trans = Cat.newTransaction("RabbitMQ message", "send queue");
-        initQueueChannel();
-        String _queueName = queueName.getNameByEnvironment(environment);
-        Cat.logEvent("queue name",_queueName);
+        if(msg == null || queueName == null){
+            return;
+        }
         RabbitMessage rm = new RabbitMessage();
         rm.setData(msg);
-        rm.setType(_queueName);
-        try {
-            Cat.logEvent("send message", rm.toJsonStr());
-            queueChannel.queueDeclare(_queueName, true, false, false, null);
-            queueChannel.basicPublish("", _queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, rm.toJsonStr().getBytes("UTF-8"));
-            if(LOGGER.isInfoEnabled()) {
-                LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _queueName, rm.toJsonStr());
-            }
-            Cat.logMetricForCount(_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
-            trans.setStatus(Transaction.SUCCESS);
-        } catch (Exception e) {
-            if(LOGGER.isErrorEnabled()) {
-                LOGGER.error("SEND ERROR:[queue:{},message:{},exception:{}]", _queueName, rm.toJsonStr(), e);
-            }
-            String err = queueName + "  rabbitmq发送消息异常";
-            Cat.logError(err, e);
-            trans.setStatus(e);
-            throw new AsuraRabbitMqException(err, e);
-        }finally {
-            trans.complete();
-        }
+        rm.setType(queueName.getNameByEnvironment(environment));
+        sendQueue(queueName,rm);
     }
 
     /**
@@ -147,14 +127,24 @@ public class RabbitMqSendClient {
      * @created 2016年3月1日 下午4:39:23
      */
     public void sendQueue(QueueName queueName, String msg,MessageMethod messageMethod) throws Exception {
+        if(msg == null || queueName == null){
+            return;
+        }
+        RabbitMessage rm = new RabbitMessage();
+        rm.setData(msg);
+        rm.setType(queueName.getNameByEnvironment(environment));
+        rm.setMethod(messageMethod.getName());
+        sendQueue(queueName,rm);
+    }
+
+    private void sendQueue(QueueName queueName,RabbitMessage rm) throws Exception {
+        if(rm == null || queueName == null){
+            return;
+        }
         Transaction trans = Cat.newTransaction("RabbitMQ message", "send queue");
         initQueueChannel();
         String _queueName = queueName.getNameByEnvironment(environment);
         Cat.logEvent("queue name",_queueName);
-        RabbitMessage rm = new RabbitMessage();
-        rm.setData(msg);
-        rm.setType(_queueName);
-        rm.setMethod(messageMethod.getName());
         try {
             Cat.logEvent("send message", rm.toJsonStr());
             queueChannel.queueDeclare(_queueName, true, false, false, null);
