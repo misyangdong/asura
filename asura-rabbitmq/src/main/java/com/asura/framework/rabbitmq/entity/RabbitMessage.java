@@ -10,6 +10,7 @@ package com.asura.framework.rabbitmq.entity;
 
 import com.alibaba.fastjson.JSON;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class RabbitMessage {
+public class RabbitMessage implements Serializable{
 
     /**
      * 序列化
