@@ -104,7 +104,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
                     if(LOGGER.isInfoEnabled()) {
-                        LOGGER.info("CONSUMER TOPIC MESSAGE:[queue:{},message:{}]", _queueName, new String(delivery.getBody(), "UTF-8"));
+                        LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName, new String(delivery.getBody(), "UTF-8"));
                     }
 
                     for (IRabbitMqMessageLisenter lisenter : lisenters) {
