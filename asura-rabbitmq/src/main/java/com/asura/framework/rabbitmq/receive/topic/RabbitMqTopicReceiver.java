@@ -106,7 +106,6 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
         @Override
         public void run() {
             Channel channel = null;
-            Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume topic");
             try {
                 channel = connection.createChannel();
                 String _exchangeName = exchangeName.getNameByEnvironment(environment);
@@ -123,11 +122,26 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                 channel.basicConsume(qname, false, consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume topic");
+                    String message = new String(delivery.getBody(), "UTF-8");
                     if(LOGGER.isInfoEnabled()) {
-                        LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(), new String(delivery.getBody(), "UTF-8"));
+                        LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(),message);
                     }
-                    for(IRabbitMqMessageLisenter lisenter:lisenters){
-                        lisenter.processMessage(delivery);
+                    Cat.logEvent("exchange name",_exchangeName);
+                    Cat.logEvent("queue name",qname);
+                    Cat.logEvent("bind key",bindingKey.getKey());
+                    Cat.logEvent("message",message);
+                    try {
+                        for(IRabbitMqMessageLisenter lisenter:lisenters){
+                            lisenter.processMessage(delivery);
+                        }
+                        trans.setStatus(Transaction.SUCCESS);
+                    }catch (Exception e){
+                        Cat.logError("队列["+_exchangeName+","+qname+","+bindingKey.getKey()+"]消费异常",e);
+                        LOGGER.error("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(),message);
+                        trans.setStatus(e);
+                    }finally {
+                        trans.complete();
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }

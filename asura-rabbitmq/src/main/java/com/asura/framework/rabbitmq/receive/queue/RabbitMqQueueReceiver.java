@@ -90,7 +90,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
         @Override
         public void run() {
             Channel channel = null;
-            Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume queue");
+
             try {
                 if (queueName == null) {
                     throw new AsuraRabbitMqException("queueName not set");
@@ -103,12 +103,24 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 channel.basicConsume(_queueName, false, consumer);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume queue");
+                    String message = new String(delivery.getBody(), "UTF-8");
                     if(LOGGER.isInfoEnabled()) {
-                        LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName, new String(delivery.getBody(), "UTF-8"));
+                        LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName,message);
                     }
-
-                    for (IRabbitMqMessageLisenter lisenter : lisenters) {
-                        lisenter.processMessage(delivery);
+                    Cat.logEvent("queue name",_queueName);
+                    Cat.logEvent("queue message",message);
+                    try {
+                        for (IRabbitMqMessageLisenter lisenter : lisenters) {
+                            lisenter.processMessage(delivery);
+                        }
+                        trans.setStatus(Transaction.SUCCESS);
+                    }catch (Exception e){
+                        Cat.logError("队列["+_queueName+"]消费异常",e);
+                        LOGGER.error("CONSUMER QUEUE MESSAGE ERROR:[queue:{},message:{}]", _queueName,message);
+                        trans.setStatus(e);
+                    }finally {
+                        trans.complete();
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
