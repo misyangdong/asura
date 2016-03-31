@@ -159,10 +159,10 @@
 								<finalName>com-asura-framework-rabbitmq-${version}</finalName>
 								<includes>
 									<include>**/**/*.class</include>
-									<include>**/**/*.properties</include>
 								</includes>
 								<excludes>
 									<include>**/logback/**/*.class</include>
+									<include>**/**/*.properties</include>
 								</excludes>
 							</configuration>
 						</execution>
