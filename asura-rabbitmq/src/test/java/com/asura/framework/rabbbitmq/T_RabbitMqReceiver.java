@@ -11,7 +11,6 @@ package com.asura.framework.rabbbitmq;
 import com.asura.framework.rabbbitmq.entity.WBindKey;
 import com.asura.framework.rabbitmq.PublishSubscribeType;
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
-import com.asura.framework.rabbitmq.entity.BindingKey;
 import com.asura.framework.rabbitmq.entity.ExchangeName;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
@@ -42,7 +41,7 @@ public class T_RabbitMqReceiver {
     @Test
     public void testSingleThradReceiver() throws Exception {
         RabbitMqQueueReceiver rabbitMqReceiver = new RabbitMqQueueReceiver();
-        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "QUEUE", "02"));
+        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TEST", "01"));
         RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
         rabbitConnectionFactory.init();
         rabbitMqReceiver.setRabbitConnectionFactory(rabbitConnectionFactory);
@@ -51,13 +50,14 @@ public class T_RabbitMqReceiver {
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
         rabbitMqReceiver.receiveMessage();
+        Thread.sleep(5000000);
     }
 
 
     @Test
     public void testExecutorReceiver() throws Exception {
         ExcutorRabbitMqQueueReceiver rabbitMqReceiver = new ExcutorRabbitMqQueueReceiver();
-        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "QUEUE", "02"));
+        rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TEST", "01"));
         RabbitConnectionFactory rabbitConnectionFactory = new RabbitConnectionFactory();
         rabbitConnectionFactory.init();
         rabbitMqReceiver.setPoolSize(5);
@@ -67,7 +67,7 @@ public class T_RabbitMqReceiver {
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
         rabbitMqReceiver.receiveMessage();
-        Thread.sleep(5000);
+        Thread.sleep(5000000);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class T_RabbitMqReceiver {
         List<IRabbitMqMessageLisenter> lisenterList = new ArrayList<>();
         lisenterList.add(lisenter);
         rabbitMqReceiver.setRabbitMqMessageLiteners(lisenterList);
-        rabbitMqReceiver.setBindingKey(new WBindKey("aaa", "*","*", "*"));
+        rabbitMqReceiver.setBindingKey(new WBindKey("aaa", "*", "*", "*"));
         rabbitMqReceiver.setQueueName(new QueueName("LSQ", "TOPIC", "02"));
         rabbitMqReceiver.setExchangeName(new ExchangeName("ss", "m", "f"));
         rabbitMqReceiver.setPublishSubscribeType(PublishSubscribeType.TOPIC);

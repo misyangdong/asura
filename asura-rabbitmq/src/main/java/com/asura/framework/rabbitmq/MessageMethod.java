@@ -10,7 +10,7 @@ package com.asura.framework.rabbitmq;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -18,8 +18,8 @@ package com.asura.framework.rabbitmq;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public enum MessageMethod {
 
@@ -27,11 +27,11 @@ public enum MessageMethod {
     UPDATE("update"),
     DELETE("delete");
 
-    MessageMethod(String name){
+    private String name;
+
+    MessageMethod(String name) {
         this.name = name;
     }
-
-    private String name;
 
     public String getName() {
         return name;

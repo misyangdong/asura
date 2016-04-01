@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -28,8 +28,8 @@ import org.junit.Test;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class T_RabbitMqSendUtil {
 
@@ -39,63 +39,63 @@ public class T_RabbitMqSendUtil {
     ExchangeName exchangeName = null;
 
     @Before
-    public void testBefore(){
+    public void testBefore() {
         connectionFactory = new RabbitConnectionFactory();
         connectionFactory.init();
-        queueName = new QueueName("LSQ","QUEUE","02");
-        routingKey = new WRoutingKey("sss","mmm","bbb","fff");
-        exchangeName = new ExchangeName("ss","m","f");
+        queueName = new QueueName("LSQ", "TEST", "01");
+        routingKey = new WRoutingKey("sss", "mmm", "bbb", "fff");
+        exchangeName = new ExchangeName("ss", "m", "f");
     }
 
     @Test
     public void testSendQueue() throws Exception {
         RabbitMqSendClient client = new RabbitMqSendClient();
         client.setRabbitConnectionFactory(connectionFactory);
-        int i =0;
+        int i = 0;
         String s = "";
-        while (++i<100000) {
-            if(s.length()<2048) {
+        while (++i < 100000) {
+            if (s.length() < 2048) {
                 s += i;
             }
-            client.sendQueue(queueName, "HELLO WORLD +" +s);
+            client.sendQueue(queueName, "HELLO WORLD +" + s);
         }
     }
 
     @Test
-    public void testSendQueue2()throws Exception {
+    public void testSendQueue2() throws Exception {
         RabbitMqSendClient client = new RabbitMqSendClient();
         client.setRabbitConnectionFactory(connectionFactory);
-        int i =0;
+        int i = 0;
         String s = "";
-        while (++i<100000) {
-            if(s.length()<2048) {
+        while (++i < 100000) {
+            if (s.length() < 2048) {
                 s += i;
             }
-            client.sendQueue(queueName, "HELLO WORLD +" +s);
+            client.sendQueue(queueName, "HELLO WORLD +" + s);
         }
     }
 
     @Test
     public void testSendTopic() throws Exception {
-        ExchangeName exchangeName = new ExchangeName("ss","m","f");
+        ExchangeName exchangeName = new ExchangeName("ss", "m", "f");
         RabbitMqSendClient client = new RabbitMqSendClient();
         client.setRabbitConnectionFactory(connectionFactory);
-        int i =0;
+        int i = 0;
         String s = "";
-        while (++i<100000) {
-            if(s.length()<2048) {
+        while (++i < 100000) {
+            if (s.length() < 2048) {
                 s += i;
             }
-            if(i%3==1){
+            if (i % 3 == 1) {
                 routingKey.setSystem("aaa");
             }
-            if(i%3==2){
+            if (i % 3 == 2) {
                 routingKey.setSystem("bbb");
             }
-            if(i%3==0){
+            if (i % 3 == 0) {
                 routingKey.setSystem("ccc");
             }
-            client.sendTopic(exchangeName,routingKey , PublishSubscribeType.TOPIC,"hello world "+i);
+            client.sendTopic(exchangeName, routingKey, PublishSubscribeType.TOPIC, "hello world " + i);
             System.out.println(i);
         }
     }

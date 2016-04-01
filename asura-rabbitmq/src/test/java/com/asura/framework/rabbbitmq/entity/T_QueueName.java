@@ -8,14 +8,13 @@
  */
 package com.asura.framework.rabbbitmq.entity;
 
-import com.asura.framework.rabbitmq.entity.NameKey;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -23,41 +22,41 @@ import org.junit.Test;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class T_QueueName {
 
     @Test
-    public void getQueueName(){
-        QueueName nameKey = new QueueName("s","m","f");
-        Assert.assertEquals(nameKey.getName(),"s_m_f");
+    public void getQueueName() {
+        QueueName nameKey = new QueueName("s", "m", "f");
+        Assert.assertEquals(nameKey.getName(), "s_m_f");
     }
 
     @Test
-    public void getQueueName1(){
+    public void getQueueName1() {
         try {
-            QueueName nameKey = new QueueName("","","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"queueName:system is null");
+            QueueName nameKey = new QueueName("", "", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "queueName:system is null");
         }
     }
 
     @Test
-    public void getQueueName2(){
+    public void getQueueName2() {
         try {
-            QueueName nameKey = new QueueName("s","","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"queueName:module is null");
+            QueueName nameKey = new QueueName("s", "", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "queueName:module is null");
         }
     }
 
     @Test
-    public void getQueueName3(){
+    public void getQueueName3() {
         try {
-            QueueName nameKey = new QueueName("s","m","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"queueName:function is null");
+            QueueName nameKey = new QueueName("s", "m", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "queueName:function is null");
         }
     }
 

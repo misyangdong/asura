@@ -26,7 +26,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class RabbitMessage implements Serializable{
+public class RabbitMessage implements Serializable {
 
     /**
      * 序列化

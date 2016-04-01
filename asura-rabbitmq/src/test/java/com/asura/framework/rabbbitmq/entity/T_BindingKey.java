@@ -9,13 +9,12 @@
 package com.asura.framework.rabbbitmq.entity;
 
 import com.asura.framework.rabbitmq.entity.BindingKey;
-import com.asura.framework.rabbitmq.entity.QueueName;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -23,38 +22,38 @@ import org.junit.Test;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class T_BindingKey {
 
     @Test
-    public void getBindingKey(){
-        BindingKey nameKey = new WBindKey("s","m","b","f");
+    public void getBindingKey() {
+        BindingKey nameKey = new WBindKey("s", "m", "b", "f");
         Assert.assertEquals(nameKey.getKey(), "s.m.b.f");
     }
 
     @Test
-    public void getBindingKey1(){
-        BindingKey nameKey = new BindingKey("","","");
+    public void getBindingKey1() {
+        BindingKey nameKey = new BindingKey("", "", "");
         Assert.assertEquals(nameKey.getKey(), "*.*.*");
     }
 
     @Test
-    public void getBindingKey2(){
-        BindingKey nameKey = new BindingKey("s","","");
+    public void getBindingKey2() {
+        BindingKey nameKey = new BindingKey("s", "", "");
         Assert.assertEquals(nameKey.getKey(), "s.*.*");
     }
 
     @Test
-    public void getBindingKey3(){
-        BindingKey nameKey = new BindingKey("s","m","");
+    public void getBindingKey3() {
+        BindingKey nameKey = new BindingKey("s", "m", "");
         Assert.assertEquals(nameKey.getKey(), "s.m.*");
     }
 
     @Test
-    public void getBindingKey4(){
-        BindingKey nameKey = new BindingKey("s","","f");
+    public void getBindingKey4() {
+        BindingKey nameKey = new BindingKey("s", "", "f");
         Assert.assertEquals(nameKey.getKey(), "s.*.f");
     }
 

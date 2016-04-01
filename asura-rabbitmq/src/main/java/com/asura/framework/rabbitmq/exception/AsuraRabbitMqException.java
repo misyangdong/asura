@@ -10,7 +10,7 @@ package com.asura.framework.rabbitmq.exception;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -18,8 +18,8 @@ package com.asura.framework.rabbitmq.exception;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class AsuraRabbitMqException extends RuntimeException {
 
@@ -31,7 +31,6 @@ public class AsuraRabbitMqException extends RuntimeException {
     }
 
     /**
-     *
      * @param message
      */
     public AsuraRabbitMqException(String message) {
@@ -39,7 +38,6 @@ public class AsuraRabbitMqException extends RuntimeException {
     }
 
     /**
-     *
      * @param message
      * @param cause
      */

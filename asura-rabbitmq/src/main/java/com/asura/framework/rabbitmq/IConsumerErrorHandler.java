@@ -12,7 +12,7 @@ import com.rabbitmq.client.QueueingConsumer;
 
 /**
  * <p>消费错误处理类</p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -20,13 +20,14 @@ import com.rabbitmq.client.QueueingConsumer;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public interface IConsumerErrorHandler {
 
     /**
      * 消息错误处理
+     *
      * @param delivery
      */
     void handlerErrorMessage(QueueingConsumer.Delivery delivery);

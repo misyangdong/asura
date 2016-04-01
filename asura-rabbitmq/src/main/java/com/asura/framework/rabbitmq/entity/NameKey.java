@@ -10,7 +10,7 @@ package com.asura.framework.rabbitmq.entity;
 
 /**
  * <p>作为队列的名称或者routingKey BingKey来</p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -18,8 +18,8 @@ package com.asura.framework.rabbitmq.entity;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public abstract class NameKey {
     /**

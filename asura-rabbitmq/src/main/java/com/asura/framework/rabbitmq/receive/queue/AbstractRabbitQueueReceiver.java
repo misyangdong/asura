@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -28,8 +28,8 @@ import java.util.List;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiver {
 
@@ -46,14 +46,14 @@ public abstract class AbstractRabbitQueueReceiver extends AbstractRabbitMqReceiv
     }
 
     @Override
-    protected void doConsumeMessage(Connection connection,String environment) throws IOException, InterruptedException {
-        if(queueName == null){
+    protected void doConsumeMessage(Connection connection, String environment) throws IOException, InterruptedException {
+        if (queueName == null) {
             throw new AsuraRabbitMqException("queueName not set");
         }
-        doConsumeQueueMessage(connection,environment);
+        doConsumeQueueMessage(connection, environment);
     }
 
-    protected abstract void doConsumeQueueMessage(Connection connection,String environment)throws IOException, InterruptedException;
+    protected abstract void doConsumeQueueMessage(Connection connection, String environment) throws IOException, InterruptedException;
 
     public QueueName getQueueName() {
         return queueName;

@@ -74,6 +74,15 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
         }
     }
 
+    public int getPoolSize() {
+        return poolSize;
+    }
+
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
+        executorService = Executors.newFixedThreadPool(poolSize);
+    }
+
     private class ConsumeWorker implements Runnable {
 
         private QueueName queueName;
@@ -107,56 +116,47 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 channel.basicConsume(_queueName, false, consumer);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-QUEUE-"+_queueName);
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-QUEUE-" + _queueName);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    if(LOGGER.isInfoEnabled()) {
+                    if (LOGGER.isInfoEnabled()) {
                         LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName, message);
                     }
-                    Cat.logEvent("queue name",_queueName);
-                    Cat.logEvent("queue message",message);
-                    Cat.logMetricForCount( "CONSUME-QUEUE-"+_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
+                    Cat.logEvent("queue name", _queueName);
+                    Cat.logEvent("queue message", message);
+                    Cat.logMetricForCount("CONSUME-QUEUE-" + _queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
                     try {
                         for (IRabbitMqMessageLisenter lisenter : lisenters) {
                             lisenter.processMessage(delivery);
                         }
                         trans.setStatus(Transaction.SUCCESS);
-                    }catch (Exception e){
-                        Cat.logError("队列["+_queueName+"]消费异常",e);
+                    } catch (Exception e) {
+                        Cat.logError("队列[" + _queueName + "]消费异常", e);
                         trans.setStatus(e);
-                    }finally {
+                    } finally {
                         trans.complete();
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             } catch (Exception e) {
-                if(e instanceof ShutdownSignalException){
+                if (e instanceof ShutdownSignalException) {
                     try {
                         channel.close();
                         connection.close();
                     } catch (IOException e1) {
-                        if(LOGGER.isErrorEnabled()) {
+                        if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("rabbmitmq close error:", e);
                         }
                     } catch (TimeoutException e1) {
-                        if(LOGGER.isErrorEnabled()) {
+                        if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("rabbmitmq close error:", e);
                         }
                     }
                 }
-                if(LOGGER.isErrorEnabled()) {
+                if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("rabbmitmq consumer error:", e);
                 }
             }
 
         }
-    }
-
-    public int getPoolSize() {
-        return poolSize;
-    }
-
-    public void setPoolSize(int poolSize) {
-        this.poolSize = poolSize;
-        executorService = Executors.newFixedThreadPool(poolSize);
     }
 }

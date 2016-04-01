@@ -10,7 +10,7 @@ package com.asura.framework.rabbitmq;
 
 /**
  * <p>Publish/Subscribe 四种交换模式</p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -18,8 +18,8 @@ package com.asura.framework.rabbitmq;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public enum PublishSubscribeType {
 
@@ -29,11 +29,11 @@ public enum PublishSubscribeType {
     FANOUT("fanout"),
     HEADERS("headers");
 
-    PublishSubscribeType(String name){
+    private String name;
+
+    PublishSubscribeType(String name) {
         this.name = name;
     }
-
-    private String name;
 
     public String getName() {
         return name;

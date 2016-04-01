@@ -8,14 +8,13 @@
  */
 package com.asura.framework.rabbbitmq.entity;
 
-import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.entity.RoutingKey;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -23,41 +22,41 @@ import org.junit.Test;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
 public class T_RoutingKey {
 
     @Test
-    public void getRoutingKey(){
-        RoutingKey routingKey = new RoutingKey("s","m","f");
+    public void getRoutingKey() {
+        RoutingKey routingKey = new RoutingKey("s", "m", "f");
         Assert.assertEquals(routingKey.getKey(), "s.m.f");
     }
 
     @Test
-    public void getRoutingKey1(){
+    public void getRoutingKey1() {
         try {
-            RoutingKey routingKey = new RoutingKey("","","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"RoutingKey:system is null");
+            RoutingKey routingKey = new RoutingKey("", "", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "RoutingKey:system is null");
         }
     }
 
     @Test
-    public void getRoutingKey2(){
+    public void getRoutingKey2() {
         try {
-            RoutingKey routingKey = new RoutingKey("s","","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"RoutingKey:module is null");
+            RoutingKey routingKey = new RoutingKey("s", "", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "RoutingKey:module is null");
         }
     }
 
     @Test
-    public void getRoutingKey3(){
+    public void getRoutingKey3() {
         try {
-            RoutingKey routingKey = new RoutingKey("s","m","");
-        }catch (Exception e){
-            Assert.assertEquals(e.getMessage(),"RoutingKey:function is null");
+            RoutingKey routingKey = new RoutingKey("s", "m", "");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getMessage(), "RoutingKey:function is null");
         }
     }
 

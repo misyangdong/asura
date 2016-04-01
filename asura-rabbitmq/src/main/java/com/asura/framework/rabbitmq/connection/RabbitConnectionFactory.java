@@ -39,20 +39,13 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitConnectionFactory {
 
-    private final static Logger logger = LoggerFactory.getLogger(RabbitConnectionFactory.class);
-
     public static final String rabbit_server = "rabbit.server";
-
     public static final String rabbit_server_port = "rabbit.server.port";
-
     public static final String rabbit_server_username = "rabbit.server.username";
-
     public static final String rabbit_server_password = "rabbit.server.password";
-
     public static final String rabbit_server_automatic_recovery_enabled = "rabbit.server.automatic_recovery_enabled";
-
     public static final String rabbit_server_env = "rabbit.server.env";
-
+    private final static Logger logger = LoggerFactory.getLogger(RabbitConnectionFactory.class);
     private PropertiesParser cfg;
 
     private String propSrc = null;

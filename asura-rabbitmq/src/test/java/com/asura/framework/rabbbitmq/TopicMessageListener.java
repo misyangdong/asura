@@ -13,7 +13,7 @@ import com.rabbitmq.client.QueueingConsumer;
 
 /**
  * <p></p>
- *
+ * <p/>
  * <PRE>
  * <BR>	修改记录
  * <BR>-----------------------------------------------
@@ -21,14 +21,14 @@ import com.rabbitmq.client.QueueingConsumer;
  * </PRE>
  *
  * @author sence
- * @since 1.0
  * @version 1.0
+ * @since 1.0
  */
-public class TopicMessageListener implements IRabbitMqMessageLisenter{
+public class TopicMessageListener implements IRabbitMqMessageLisenter {
 
     @Override
     public void processMessage(QueueingConsumer.Delivery delivery) {
-        System.out.println("["+ delivery.getEnvelope().getRoutingKey()+"][receive:"+new String(delivery.getBody())+"]");
+        System.out.println("[" + delivery.getEnvelope().getRoutingKey() + "][receive:" + new String(delivery.getBody()) + "]");
     }
 
 }

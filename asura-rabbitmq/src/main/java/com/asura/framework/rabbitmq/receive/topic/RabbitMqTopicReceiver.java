@@ -16,7 +16,10 @@ import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,33 +50,34 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                  BindingKey bindingKey, ExchangeName exchangeName) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, null, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                  BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners,null, bindingKey, exchangeName, publishSubscribeType);
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, null, bindingKey, exchangeName, publishSubscribeType);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                  QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName, bindingKey, exchangeName, PublishSubscribeType.DIRECT);
     }
 
     public RabbitMqTopicReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners,
                                  QueueName queueName, BindingKey bindingKey, ExchangeName exchangeName, PublishSubscribeType publishSubscribeType) {
-        super(rabbitConnectionFactory, rabbitMqMessageLiteners,queueName, bindingKey, exchangeName, publishSubscribeType);
+        super(rabbitConnectionFactory, rabbitMqMessageLiteners, queueName, bindingKey, exchangeName, publishSubscribeType);
     }
 
     /**
      * 执行真正的消费工作
+     *
      * @param connection
      * @throws IOException
      * @throws InterruptedException
      */
     @Override
-    public void doConsumeTopicMessage(Connection connection,String environment) throws IOException, InterruptedException {
-        ConsumeWorker consumeWorker = new ConsumeWorker(connection,environment, getExchangeName(),getQueueName() ,getBindingKey(), getPublishSubscribeType().getName(), getRabbitMqMessageLiteners());
+    public void doConsumeTopicMessage(Connection connection, String environment) throws IOException, InterruptedException {
+        ConsumeWorker consumeWorker = new ConsumeWorker(connection, environment, getExchangeName(), getQueueName(), getBindingKey(), getPublishSubscribeType().getName(), getRabbitMqMessageLiteners());
         new Thread(consumeWorker).start();
     }
 
@@ -93,7 +97,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
 
         private List<IRabbitMqMessageLisenter> lisenters;
 
-        private ConsumeWorker(Connection connection,String environment, ExchangeName exchangeName, QueueName queueName,BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
+        private ConsumeWorker(Connection connection, String environment, ExchangeName exchangeName, QueueName queueName, BindingKey bindingKey, String routingType, List<IRabbitMqMessageLisenter> lisenters) {
             this.bindingKey = bindingKey;
             this.exchangeName = exchangeName;
             this.routingType = routingType;
@@ -111,57 +115,57 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                 String _exchangeName = exchangeName.getNameByEnvironment(environment);
                 channel.exchangeDeclare(_exchangeName, routingType, true);
                 String qname;
-                if(queueName == null){
+                if (queueName == null) {
                     qname = channel.queueDeclare().getQueue();
-                }else{
+                } else {
                     qname = queueName.getNameByEnvironment(environment);
-                    channel.queueDeclare(qname,true,false,false,null);
+                    channel.queueDeclare(qname, true, false, false, null);
                 }
                 channel.queueBind(qname, _exchangeName, bindingKey.getKey());
                 QueueingConsumer consumer = new QueueingConsumer(channel);
                 channel.basicConsume(qname, false, consumer);
-                while(true){
+                while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-TOPIC-"+_exchangeName);
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-TOPIC-" + _exchangeName);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    if(LOGGER.isInfoEnabled()) {
-                        LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(),message);
+                    if (LOGGER.isInfoEnabled()) {
+                        LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(), message);
                     }
-                    Cat.logEvent("exchange name",_exchangeName);
-                    Cat.logEvent("queue name",qname);
-                    Cat.logEvent("bind key",bindingKey.getKey());
-                    Cat.logEvent("message",message);
-                    Cat.logMetricForCount("CONSUME-TOPIC-"+_exchangeName);
+                    Cat.logEvent("exchange name", _exchangeName);
+                    Cat.logEvent("queue name", qname);
+                    Cat.logEvent("bind key", bindingKey.getKey());
+                    Cat.logEvent("message", message);
+                    Cat.logMetricForCount("CONSUME-TOPIC-" + _exchangeName);
                     try {
-                        for(IRabbitMqMessageLisenter lisenter:lisenters){
+                        for (IRabbitMqMessageLisenter lisenter : lisenters) {
                             lisenter.processMessage(delivery);
                         }
                         trans.setStatus(Transaction.SUCCESS);
-                    }catch (Exception e){
-                        Cat.logError("队列["+_exchangeName+","+qname+","+bindingKey.getKey()+"]消费异常",e);
-                        LOGGER.error("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(),message);
+                    } catch (Exception e) {
+                        Cat.logError("队列[" + _exchangeName + "," + qname + "," + bindingKey.getKey() + "]消费异常", e);
+                        LOGGER.error("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(), message);
                         trans.setStatus(e);
-                    }finally {
+                    } finally {
                         trans.complete();
                     }
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             } catch (Exception e) {
-                if(e instanceof ShutdownSignalException){
+                if (e instanceof ShutdownSignalException) {
                     try {
                         channel.close();
                         connection.close();
                     } catch (IOException e1) {
-                        if(LOGGER.isErrorEnabled()) {
+                        if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("rabbmitmq close error:", e);
                         }
                     } catch (TimeoutException e1) {
-                        if(LOGGER.isErrorEnabled()) {
+                        if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("rabbmitmq close error:", e);
                         }
                     }
                 }
-                if(LOGGER.isErrorEnabled()) {
+                if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("rabbmitmq consumer error:", e);
                 }
             }

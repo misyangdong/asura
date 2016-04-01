@@ -45,10 +45,10 @@ public class T_RabbitConnectionFactorySpring {
 
 
     @Test
-    public void testSendQueue2()throws Exception {
+    public void testSendQueue2() throws Exception {
 
-        while(true) {
-            rabbitSendClient.sendQueue( new QueueName("LSQ","QUEUE","02"), "HELLO WORLD +");
+        while (true) {
+            rabbitSendClient.sendQueue(new QueueName("LSQ", "QUEUE", "02"), "HELLO WORLD +");
         }
     }
 
