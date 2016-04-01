@@ -103,13 +103,14 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                 channel.basicConsume(_queueName, false, consumer);
                 while (true) {
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume queue");
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-QUEUE-"+_queueName);
                     String message = new String(delivery.getBody(), "UTF-8");
                     if(LOGGER.isInfoEnabled()) {
                         LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName,message);
                     }
                     Cat.logEvent("queue name",_queueName);
                     Cat.logEvent("queue message",message);
+                    Cat.logMetricForCount(_queueName);
                     try {
                         for (IRabbitMqMessageLisenter lisenter : lisenters) {
                             lisenter.processMessage(delivery);

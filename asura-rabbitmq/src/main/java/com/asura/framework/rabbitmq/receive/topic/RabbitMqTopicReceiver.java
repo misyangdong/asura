@@ -122,7 +122,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                 channel.basicConsume(qname, false, consumer);
                 while(true){
                     QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "consume topic");
+                    Transaction trans = Cat.newTransaction("RabbitMQ Message", "CONSUME-TOPIC-"+_exchangeName);
                     String message = new String(delivery.getBody(), "UTF-8");
                     if(LOGGER.isInfoEnabled()) {
                         LOGGER.info("CONSUMER TOPIC MESSAGE:[exchange:{},queue:{},bindingKey:{},message:{}]", _exchangeName, qname, bindingKey.getKey(),message);

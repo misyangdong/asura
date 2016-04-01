@@ -141,9 +141,9 @@ public class RabbitMqSendClient {
         if(rm == null || queueName == null){
             return;
         }
-        Transaction trans = Cat.newTransaction("RabbitMQ message", "send queue");
         initQueueChannel();
         String _queueName = queueName.getNameByEnvironment(environment);
+        Transaction trans = Cat.newTransaction("RabbitMQ message", "PUBLISH-QUEUE-"+_queueName);
         Cat.logEvent("queue name",_queueName);
         try {
             Cat.logEvent("send message", rm.toJsonStr());
@@ -176,9 +176,9 @@ public class RabbitMqSendClient {
      * @created 2016年3月1日 下午4:40:59
      */
     public void sendTopic(ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
-        Transaction trans = Cat.newTransaction("RabbitMQ message", "send topic");
         initTopicChannel();
         String _exchange = exchangeName.getNameByEnvironment(environment);
+        Transaction trans = Cat.newTransaction("RabbitMQ message", "PUBLISH-TOPIC-" + _exchange);
         RabbitMessage rm = new RabbitMessage();
         rm.setData(msg);
         rm.setType(_exchange);
