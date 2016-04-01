@@ -114,7 +114,7 @@ public class ExcutorRabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     }
                     Cat.logEvent("queue name",_queueName);
                     Cat.logEvent("queue message",message);
-                    Cat.logMetricForCount(_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
+                    Cat.logMetricForCount( "CONSUME-QUEUE-"+_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
                     try {
                         for (IRabbitMqMessageLisenter lisenter : lisenters) {
                             lisenter.processMessage(delivery);

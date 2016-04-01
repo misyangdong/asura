@@ -131,6 +131,7 @@ public class RabbitMqTopicReceiver extends AbstractRabbitMqTopicReceiver {
                     Cat.logEvent("queue name",qname);
                     Cat.logEvent("bind key",bindingKey.getKey());
                     Cat.logEvent("message",message);
+                    Cat.logMetricForCount("CONSUME-TOPIC-"+_exchangeName);
                     try {
                         for(IRabbitMqMessageLisenter lisenter:lisenters){
                             lisenter.processMessage(delivery);

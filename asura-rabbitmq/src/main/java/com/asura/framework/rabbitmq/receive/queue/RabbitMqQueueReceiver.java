@@ -110,7 +110,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     }
                     Cat.logEvent("queue name",_queueName);
                     Cat.logEvent("queue message",message);
-                    Cat.logMetricForCount(_queueName);
+                    Cat.logMetricForCount("CONSUME-QUEUE-"+_queueName);
                     try {
                         for (IRabbitMqMessageLisenter lisenter : lisenters) {
                             lisenter.processMessage(delivery);

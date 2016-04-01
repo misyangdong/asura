@@ -152,7 +152,7 @@ public class RabbitMqSendClient {
             if(LOGGER.isInfoEnabled()) {
                 LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _queueName, rm.toJsonStr());
             }
-            Cat.logMetricForCount(_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
+            Cat.logMetricForCount("PUBLISH-QUEUE-"+_queueName); // 统计请求次数, 可以查看对应队列中放入了多少信息
             trans.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             if(LOGGER.isErrorEnabled()) {
@@ -183,14 +183,14 @@ public class RabbitMqSendClient {
         rm.setData(msg);
         rm.setType(_exchange);
         try {
-            Cat.logEvent("send message",rm.toJsonStr());
+            Cat.logEvent("send message", rm.toJsonStr());
             rm.setType(_exchange);
             topicChannel.exchangeDeclare(_exchange, type.getName(), true);
             topicChannel.basicPublish(_exchange, routingKey.getKey(), null, rm.toJsonStr().getBytes("UTF-8"));
             if(LOGGER.isInfoEnabled()) {
                 LOGGER.info("SEND SUCCESS:[queue:{},message:{}]", _exchange, rm.toJsonStr());
             }
-            Cat.logMetricForCount(_exchange); // 统计请求次数, 可以查看对应队列中放入了多少信息
+            Cat.logMetricForCount("PUBLISH-TOPIC-"+_exchange); // 统计请求次数, 可以查看对应队列中放入了多少信息
             trans.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             if(LOGGER.isErrorEnabled()) {
