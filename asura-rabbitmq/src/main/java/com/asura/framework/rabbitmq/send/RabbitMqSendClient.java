@@ -142,7 +142,7 @@ public class RabbitMqSendClient {
         }
         initQueueChannel();
         String _queueName = queueName.getNameByEnvironment(environment);
-        Transaction trans = Cat.newTransaction("RabbitMQ message", "PUBLISH-QUEUE-" + _queueName);
+        Transaction trans = Cat.newTransaction("RabbitMQ Message", "PUBLISH-QUEUE-" + _queueName);
         Cat.logEvent("queue name", _queueName);
         try {
             Cat.logEvent("send message", rm.toJsonStr());
@@ -177,7 +177,7 @@ public class RabbitMqSendClient {
     public void sendTopic(ExchangeName exchangeName, RoutingKey routingKey, PublishSubscribeType type, String msg) throws Exception {
         initTopicChannel();
         String _exchange = exchangeName.getNameByEnvironment(environment);
-        Transaction trans = Cat.newTransaction("RabbitMQ message", "PUBLISH-TOPIC-" + _exchange);
+        Transaction trans = Cat.newTransaction("RabbitMQ Message", "PUBLISH-TOPIC-" + _exchange);
         RabbitMessage rm = new RabbitMessage();
         rm.setData(msg);
         rm.setType(_exchange);
