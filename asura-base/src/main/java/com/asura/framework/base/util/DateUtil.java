@@ -9,16 +9,19 @@
  */
 package com.asura.framework.base.util;
 
-import com.asura.framework.base.exception.BusinessException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.asura.framework.base.exception.BusinessException;
 
 /**
  * <p>日期工具类</p>
@@ -708,6 +711,55 @@ public class DateUtil {
 		calendar.setTime(new Date());
 		calendar.add(Calendar.HOUR, hour*-1);
 		return getTimestampFormat().format(calendar.getTime());
+	}
+	
+	/**
+	 * 
+	 * 获取两个日期之间的天数
+	 * 
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public static int getDatebetweenOfDayNum(Date startDate, Date endDate) {
+		Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);  
+        long time1 = cal.getTimeInMillis();               
+        cal.setTime(endDate);  
+        long time2 = cal.getTimeInMillis();       
+        long between_days=(time2-time1)/(1000*3600*24);  
+          
+       return Integer.parseInt(String.valueOf(between_days));  
+	}
+	
+	/**
+	 * 获取两个日期间的区间日期
+	 * 
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public static List<Date> getDatebetweenOfDays(Date startDate, Date endDate) {
+		List<Date> list = new ArrayList<Date>();
+        GregorianCalendar gc1=new GregorianCalendar(),gc2=new GregorianCalendar();   
+        gc1.setTime(startDate);   
+        gc2.setTime(endDate);   
+        do{   
+            GregorianCalendar gc3=(GregorianCalendar)gc1.clone();   
+            list.add(gc3.getTime());
+            System.out.println(gc3.getTime());
+            gc1.add(Calendar.DAY_OF_MONTH, 1);                
+         }while(!gc1.after(gc2));   
+        return null;   
+	}
+	
+	
+	public static void main(String []args) throws ParseException {
+		Date d1 = parseDate("2016-04-03 15:20:00", timestampPattern);
+		Date d2 = parseDate("2016-09-09 19:20:00", timestampPattern);
+		System.out.println(getDatebetweenOfDayNum(d1 , d2));
+		
+		getDatebetweenOfDays(d1, d2);
 	}
 	
 
