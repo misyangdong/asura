@@ -716,6 +716,11 @@ public class DateUtil {
 	/**
 	 * 
 	 * 获取两个日期之间的天数
+	 * 例如：startDate=2016-04-03   endDate=2016-04-05
+	 *     返回：2
+	 *     
+	 * @author zhangshaobin
+	 * @created 2016年4月3日 下午午17:41:45
 	 * 
 	 * @param startDate
 	 * @param endDate
@@ -734,7 +739,12 @@ public class DateUtil {
 	
 	/**
 	 * 获取两个日期间的区间日期
-	 * 
+	 * 例如：startDate=2016-04-03   endDate=2016-04-05
+	 *     返回：2016-04-03  2016-04-04  2016-04-05  集合
+	 *     
+	 * @author zhangshaobin
+	 * @created 2016年4月3日 下午午17:46:20
+	 *     
 	 * @param startDate
 	 * @param endDate
 	 * @return
@@ -756,7 +766,7 @@ public class DateUtil {
 	
 	public static void main(String []args) throws ParseException {
 		Date d1 = parseDate("2016-04-03 15:20:00", timestampPattern);
-		Date d2 = parseDate("2016-09-09 19:20:00", timestampPattern);
+		Date d2 = parseDate("2016-04-05 19:20:00", timestampPattern);
 		System.out.println(getDatebetweenOfDayNum(d1 , d2));
 		
 		getDatebetweenOfDays(d1, d2);

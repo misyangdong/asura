@@ -1,6 +1,6 @@
 ﻿@ECHO OFF
 
-SET WORKING_SPACE=F:\work_e\workspace_asura\asura
+SET WORKING_SPACE=F:\work_minsu\workspace_asura\asura
 
 
 CD %WORKING_SPACE%\asura-base
