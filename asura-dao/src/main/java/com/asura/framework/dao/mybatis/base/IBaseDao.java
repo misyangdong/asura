@@ -34,7 +34,7 @@ public interface IBaseDao {
 	 * @created 2016-5-4 下午5:51:23
 	 *
 	 * @param sqlId	SQL语句ID
-	 * @param maps	返回值类型
+	 * @param maps	返回值类型（maps）
 	 * @param params	条件参数
 	 * @return	查询到的结果集合
 	 */

@@ -37,6 +37,7 @@ import com.asura.framework.dao.mybatis.paginator.domain.PageList;
 public class MybatisDaoContext extends BaseMybatisDaoSupport implements IBaseDao{
 
 	/* (non-Javadoc)
+	*
  	* @see com.asura.framework.dao.mybatis.base.IBaseDao#findAll(java.lang.String)
  	*/
 	@Override
