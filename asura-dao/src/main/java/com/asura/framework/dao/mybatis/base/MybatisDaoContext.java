@@ -37,6 +37,14 @@ import com.asura.framework.dao.mybatis.paginator.domain.PageList;
 public class MybatisDaoContext extends BaseMybatisDaoSupport implements IBaseDao{
 
 	/* (non-Javadoc)
+ 	* @see com.asura.framework.dao.mybatis.base.IBaseDao#findAll(java.lang.String)
+ 	*/
+	@Override
+	public Map<String,Map<String,Object>> findAll(String sqlId,Map<Object,Object> maps,Map<String, Object> params){
+		return getReadSqlSessionTemplate().selectMap(sqlId,params,"key");
+	}
+
+	/* (non-Javadoc)
 	 * @see com.asura.framework.dao.mybatis.base.IBaseDao#findAll(java.lang.String)
 	 */
 	@Override

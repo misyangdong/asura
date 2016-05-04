@@ -27,6 +27,21 @@ import com.asura.framework.dao.mybatis.paginator.domain.PageBounds;
 public interface IBaseDao {
 
 	/**
+	 *
+	 * 查询指定SQL语句的所有记录
+	 *
+	 * @author GuoJ
+	 * @created 2016-5-4 下午5:51:23
+	 *
+	 * @param sqlId	SQL语句ID
+	 * @param maps	返回值类型
+	 * @param params	条件参数
+	 * @return	查询到的结果集合
+	 */
+	public Map<String,Map<String,Object>> findAll(String sqlId,Map<Object,Object> maps,Map<String, Object> params);
+
+
+	/**
 	 * 
 	 * 查询指定SQL语句的所有记录
 	 *
@@ -47,7 +62,7 @@ public interface IBaseDao {
 	 * @created 2012-12-19 下午5:51:23
 	 *
 	 * @param sqlId	SQL语句ID
-	 * @param clazz	返回值类型
+	 * @param sqlId	返回值类型
 	 * @param params	条件参数
 	 * @return	查询到的结果集合
 	 */
@@ -176,7 +191,7 @@ public interface IBaseDao {
 	 *
 	 * @param sqlId	SQL语句ID
 	 * @param clazz	返回值类型
-	 * @param param	条件参数
+	 * @param clazz	条件参数
 	 * @return	查询到的结果
 	 */
 	public <T> T findOne(String sqlId, Class<T> clazz);
@@ -190,7 +205,7 @@ public interface IBaseDao {
 	 *
 	 * @param sqlId	SQL语句ID
 	 * @param clazz	返回值类型
-	 * @param param	条件参数
+	 * @param clazz	条件参数
 	 * @return	查询到的结果
 	 */
 	public <T> T findOneSlave(String sqlId, Class<T> clazz);
@@ -317,7 +332,7 @@ public interface IBaseDao {
 	 * @created 2012-11-5 下午7:33:17
 	 *
 	 * @param sqlId	SQL语句ID
-	 * @param params	查询参数
+	 * @param sqlId	查询参数
 	 * @return	成功删除记录数
 	 */
 	public int delete(String sqlId, BaseEntity entity);
@@ -354,5 +369,6 @@ public interface IBaseDao {
 	public long countBySlave(String sqlId) ;
 	
 	public long countBySlave(String sqlId, Map<String, Object> params);
+
 	
 }
