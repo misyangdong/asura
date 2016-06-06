@@ -68,9 +68,13 @@ public class MybatisDaoContext extends BaseMybatisDaoSupport implements IBaseDao
 	public <T extends BaseEntity> PagingResult<T> findForPage(String sqlId,
 			Class<T> clazz, Object params, PageBounds pageBounds) {
 		List<T> list = getReadSqlSessionTemplate().selectList(sqlId, params, pageBounds);
-		PageList<T> pl = (PageList<T>) list;
-		PagingResult<T> pr = new PagingResult<>(pl.getPaginator().getTotalCount(), pl);
-		return pr;
+		// 后端如果不分页，直接返回的类型为ArrayList，需要作出判断
+		if (list instanceof PageList) {
+			PageList<T> pl = (PageList<T>) list;
+			return new PagingResult<>(pl.getPaginator().getTotalCount(), pl);
+		} else {
+			return new PagingResult<>(0, list);
+		}
 	}
 
 
