@@ -105,7 +105,7 @@ public class MybatisDaoContext extends BaseMybatisDaoSupport implements IBaseDao
 	@Override
 	public <T> T findOneSlave(String sqlId, Class<T> clazz,
 			Map<String, Object> params) {
-		return (T)getWriteSqlSessionTemplate().selectOne(sqlId, params);
+		return (T)getReadSqlSessionTemplate().selectOne(sqlId, params);
 	}
 	
 	@SuppressWarnings("unchecked")
