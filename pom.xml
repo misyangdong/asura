@@ -860,14 +860,14 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>ziroom</id>
-			<url>http://mvn.ziroom.com/sms-release</url>
+    <distributionManagement>
+		<repository>		
+			<id>releases</id>
+			<url>http://maven.ziroom.com:8081/nexus/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>ziroom</id>
-			<url>http://mvn.ziroom.com/sms-snapshot</url>
+			<id>snapshots</id>
+			<url>http://maven.ziroom.com:8081/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
