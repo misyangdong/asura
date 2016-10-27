@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.JavaType;
@@ -57,6 +58,7 @@ public class JsonEntityTransform {
 	 */
 	public static <T extends BaseEntity> T json2Entity(String json, Class<T> clazz) throws BusinessException {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		T entity = null;
 		try {
 			entity = mapper.readValue(json, clazz);
@@ -81,6 +83,7 @@ public class JsonEntityTransform {
 	 */
 	public static <T> T json2Object(String json, Class<T> clazz) throws BusinessException {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		T t = null;
 		try {
 			t = mapper.readValue(json, clazz);
@@ -106,6 +109,7 @@ public class JsonEntityTransform {
 	 */
 	public static DataTransferObject json2DataTransferObject(String json) throws BusinessException {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		DataTransferObject dto = null;
 		try {
 			dto = mapper.readValue(json, DataTransferObject.class);
@@ -129,6 +133,7 @@ public class JsonEntityTransform {
 	 */
 	public static SearchModel json2SearchModel(String json) throws BusinessException {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		SearchModel searchModel = null;
 		try {
 			searchModel = mapper.readValue(json, SearchModel.class);
@@ -154,6 +159,7 @@ public class JsonEntityTransform {
 	@SuppressWarnings("unchecked")
 	public static <T extends BaseEntity> List<T>  json2List(String json, Class<T> clazz) throws BusinessException {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
 		try {
 			return (List<T>)mapper.readValue(json, javaType);
