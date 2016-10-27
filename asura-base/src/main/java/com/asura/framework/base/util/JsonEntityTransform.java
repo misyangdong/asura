@@ -278,6 +278,7 @@ public class JsonEntityTransform {
 	 */
 	public static <T> List<T> json2ObjectList(String json,Class<T> clazz){
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
 		try {
 			return mapper.readValue(json, javaType);
