@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -138,6 +139,7 @@ public class DataTransferObject implements Serializable {
      */
     public  <T> T  parseData(String key,TypeReference<T> type){
         ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
         try {
             if(Check.NuNObj(this)){
                 return null;
