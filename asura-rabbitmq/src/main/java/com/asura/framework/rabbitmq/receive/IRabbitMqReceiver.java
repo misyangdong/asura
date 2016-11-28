@@ -8,6 +8,8 @@
  */
 package com.asura.framework.rabbitmq.receive;
 
+import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
+
 /**
  * <p>RabbitMQ 消费者接口</p>
  * <p/>
@@ -29,4 +31,9 @@ public interface IRabbitMqReceiver {
      */
     void receiveMessage() throws Exception;
 
+    /**
+     * 关闭连接
+     * @throws AsuraRabbitMqException
+     */
+    void destroyResource() throws AsuraRabbitMqException;
 }

@@ -209,9 +209,9 @@ public class RabbitConnectionFactory {
      * @created 2016年3月1日 下午4:36:28
      */
     public Connection getConnection() throws Exception {
-        if (connection == null) {
+        if (connection == null || !connection.isOpen()) {
             synchronized (this) {
-                if (connection == null) {
+                if (connection == null || !connection.isOpen()) {
                     connection = getConnectFactory().newConnection();
                 }
             }

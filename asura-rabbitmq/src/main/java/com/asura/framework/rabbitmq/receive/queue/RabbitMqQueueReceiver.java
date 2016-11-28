@@ -12,6 +12,7 @@ import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.entity.QueueName;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
 import com.asura.framework.rabbitmq.receive.IRabbitMqMessageLisenter;
+import com.asura.framework.rabbitmq.receive.failover.IReceiveFailover;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.rabbitmq.client.Channel;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -66,7 +68,7 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
      */
     @Override
     protected void doConsumeQueueMessage(Connection connection, String environment) throws IOException, InterruptedException {
-        new Thread(new ConsumeWorker(this.getQueueName(), connection, environment, this.getRabbitMqMessageLiteners())).start();
+        new Thread(new ConsumeWorker(this.getQueueName(), connection, environment, this.getRabbitMqMessageLiteners(),this.getReceiveFailover())).start();
 
     }
 
@@ -80,17 +82,19 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
 
         private String enviroment;
 
-        private ConsumeWorker(QueueName queueName, Connection connection, String environment, List<IRabbitMqMessageLisenter> lisenters) {
+        private IReceiveFailover receiveFailover;
+
+        private ConsumeWorker(QueueName queueName, Connection connection, String environment, List<IRabbitMqMessageLisenter> lisenters,IReceiveFailover receiveFailover) {
             this.queueName = queueName;
             this.connection = connection;
             this.lisenters = lisenters;
             this.enviroment = environment;
+            this.receiveFailover = receiveFailover;
         }
 
         @Override
         public void run() {
             Channel channel = null;
-
             try {
                 if (queueName == null) {
                     throw new AsuraRabbitMqException("queueName not set");
@@ -108,6 +112,11 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     if (LOGGER.isInfoEnabled()) {
                         LOGGER.info("CONSUMER QUEUE MESSAGE:[queue:{},message:{}]", _queueName, message);
                     }
+
+                    if (queueName == null) {
+                        throw new AsuraRabbitMqException("queueName not set");
+                    }
+
                     Cat.logEvent("queue name", _queueName);
                     Cat.logEvent("queue message", message);
                     Cat.logMetricForCount("CONSUME-QUEUE-" + _queueName);
@@ -126,23 +135,10 @@ public class RabbitMqQueueReceiver extends AbstractRabbitQueueReceiver {
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             } catch (Exception e) {
-                if (e instanceof ShutdownSignalException) {
-                    try {
-                        channel.close();
-                        connection.close();
-                    } catch (IOException e1) {
-                        if (LOGGER.isErrorEnabled()) {
-                            LOGGER.error("rabbmitmq close error:", e);
-                        }
-                    } catch (TimeoutException e1) {
-                        if (LOGGER.isErrorEnabled()) {
-                            LOGGER.error("rabbmitmq close error:", e);
-                        }
-                    }
-                }
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("rabbmitmq consumer error:", e);
                 }
+                receiveFailover.doFailover();
             }
 
         }

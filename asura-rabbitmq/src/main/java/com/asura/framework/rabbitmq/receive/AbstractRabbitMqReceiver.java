@@ -10,7 +10,11 @@ package com.asura.framework.rabbitmq.receive;
 
 import com.asura.framework.rabbitmq.connection.RabbitConnectionFactory;
 import com.asura.framework.rabbitmq.exception.AsuraRabbitMqException;
+import com.asura.framework.rabbitmq.receive.failover.IReceiveFailover;
+import com.asura.framework.rabbitmq.receive.failover.SampleReceiveFailover;
 import com.rabbitmq.client.Connection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +33,7 @@ import java.util.List;
  * @since 1.0
  */
 public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
-
+    private Logger LOGGER = LoggerFactory.getLogger(AbstractRabbitMqReceiver.class);
     /**
      * MQ factory
      */
@@ -40,17 +44,26 @@ public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
      */
     private List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners;
 
+    private Connection connection;
+
+    private IReceiveFailover receiveFailover;
+
     /**
      * 空构造方法
      */
     public AbstractRabbitMqReceiver() {
-        this.rabbitConnectionFactory = new RabbitConnectionFactory();
-        rabbitConnectionFactory.init();
+        receiveFailover = new SampleReceiveFailover(this);
     }
 
     public AbstractRabbitMqReceiver(RabbitConnectionFactory rabbitConnectionFactory, List<IRabbitMqMessageLisenter> rabbitMqMessageLiteners) {
-        this.rabbitConnectionFactory = rabbitConnectionFactory;
+        if(rabbitConnectionFactory==null){
+            this.rabbitConnectionFactory = new RabbitConnectionFactory();
+            rabbitConnectionFactory.init();
+        }else{
+            this.rabbitConnectionFactory = rabbitConnectionFactory;
+        }
         this.rabbitMqMessageLiteners = rabbitMqMessageLiteners;
+        receiveFailover = new SampleReceiveFailover(this);
     }
 
 
@@ -65,8 +78,21 @@ public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
          * where as a channel is a virtual connection inside it.
          * This way you can use as many (virtual) connections as you want inside your application without overloading the broker with TCP connections
          */
-        Connection connection = rabbitConnectionFactory.getConnection();
+
+        connection = rabbitConnectionFactory.getConnection();
         doConsumeMessage(connection, rabbitConnectionFactory.getEnvironment());
+    }
+
+    @Override
+    public void destroyResource() throws AsuraRabbitMqException {
+        try {
+            if(connection.isOpen()){
+                connection.close();
+            }
+        }catch (IOException e){
+            LOGGER.warn("destroy resource error ",e);
+            throw new AsuraRabbitMqException(e.getMessage());
+        }
     }
 
     /**
@@ -89,4 +115,19 @@ public abstract class AbstractRabbitMqReceiver implements IRabbitMqReceiver {
         this.rabbitMqMessageLiteners = rabbitMqMessageLiteners;
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public IReceiveFailover getReceiveFailover() {
+        return receiveFailover;
+    }
+
+    public void setReceiveFailover(IReceiveFailover receiveFailover) {
+        this.receiveFailover = receiveFailover;
+    }
 }
