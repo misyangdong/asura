@@ -86,7 +86,7 @@ public class SystemLogger {
 			final Object retVal = joinPoint.proceed();
 			long end = System.currentTimeMillis();
 			// 记录耗时
-			logger.info("{}, 耗时：{} ms, 进入aop到执行完耗时：{} ms", declaringTypeName + "-" + signatureName, (end - start), (end - start_all));
+//			logger.info("{}, 耗时：{} ms, 进入aop到执行完耗时：{} ms", declaringTypeName + "-" + signatureName, (end - start), (end - start_all));
 			Cat.logEvent(declaringTypeName, signatureName, "0", logJson+" 耗时:" + (end - start) + " ms" + " 时间戳：" + System.currentTimeMillis());
 			/**
 			 * 设置消息的状态,必须设置，0:标识成功,其他标识发生了异常
