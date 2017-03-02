@@ -21,6 +21,8 @@ CD %WORKING_SPACE%\asura-web
 CALL mvn -Dmaven.test.skip=true clean package
 CD %WORKING_SPACE%\asura-quartz
 CALL mvn -Dmaven.test.skip=true clean package
+CD %WORKING_SPACE%\asura-rabbitmq
+CALL mvn -Dmaven.test.skip=true clean package
 
 
 CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asura-framework-logback -Dversion=0.0.1 -Dpackaging=jar -Dfile=%WORKING_SPACE%\asura-log\target\com-asura-framework-logback-0.0.1.jar -Durl=http://maven.ziroom.com:8081/nexus/content/repositories/releases/ -DrepositoryId=releases
@@ -36,6 +38,7 @@ CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asura-framework
 CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asura-framework-monitor-client -Dversion=0.0.1 -Dpackaging=jar -Dfile=%WORKING_SPACE%\asura-monitor\target\com-asura-framework-monitor-client-0.0.1.jar -Durl=http://maven.ziroom.com:8081/nexus/content/repositories/releases/ -DrepositoryId=releases
 CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asura-framework-quartz-ext -Dversion=1.8.6 -Dpackaging=jar -Dfile=%WORKING_SPACE%\asura-quartz\target\com-asura-framework-quartz-ext-1.8.6.jar -Durl=http://maven.ziroom.com:8081/nexus/content/repositories/releases/ -DrepositoryId=releases
 CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asuraquartz-framework-quartz-all -Dversion=1.8.6 -Dpackaging=jar -Dfile=%WORKING_SPACE%\asura-quartz\target\com-asuraquartz-framework-quartz-all-1.8.6.jar -Durl=http://maven.ziroom.com:8081/nexus/content/repositories/releases/ -DrepositoryId=releases
+CALL mvn deploy:deploy-file -DgroupId=com.asura -DartifactId=com-asura-framework-rabbitmq -Dversion=0.0.1 -Dpackaging=jar -Dfile=%WORKING_SPACE%\asura-rabbitmq\target\com-asura-framework-rabbitmq-0.0.1.jar -Durl=http://maven.ziroom.com:8081/nexus/content/repositories/releases/ -DrepositoryId=releases
 
 
 

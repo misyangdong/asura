@@ -63,7 +63,7 @@ public class AsuraSubAnnotationProcessor {
 			file = new File(path);
 			if (file.isFile()) {
 				if ((file.getName().startsWith("com-asura-") || file.getName().startsWith("com.asura-") || file
-						.getName().startsWith("sms-biz"))) {
+						.getName().startsWith("minsu"))) {
 					try {
 						jarFile = new JarFile(file);
 						s = jarFile.entries();
