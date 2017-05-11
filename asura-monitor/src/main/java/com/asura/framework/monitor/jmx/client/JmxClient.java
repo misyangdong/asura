@@ -116,11 +116,12 @@ public class JmxClient {
 	 * @return	MBean实现
 	 * @throws BusinessException
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> T getCustomMBean(Class<T> clazz, String objectName, String applicationIp) throws BusinessException {
 		try {
 			JMXServiceURL url = new JMXServiceURL("jmxmp", applicationIp, 9020);
 			jmxc = JMXConnectorFactory.connect(url, null);
-			return MBeanServerInvocationHandler.newProxyInstance(jmxc.getMBeanServerConnection(), 
+			return (T) MBeanServerInvocationHandler.newProxyInstance(jmxc.getMBeanServerConnection(), 
 					new ObjectName(objectName), clazz, false); 
 		} catch (MalformedURLException e) {
 			logger.error("创建JMX连接异常，URL格式不正确。", e.getCause());
