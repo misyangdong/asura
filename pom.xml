@@ -115,7 +115,7 @@
 
 	<dependencyManagement>
 		<dependencies>
-		
+
 			<!-- rabbitmq start -->
 			<dependency>
 				<groupId>com.rabbitmq</groupId>
@@ -138,7 +138,7 @@
 				<version>${hessian.version}</version>
 			</dependency>
 			<!-- rabbitmq end -->
-			
+
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
@@ -529,22 +529,11 @@
 				<version>${xstream.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.jmx</groupId>
-				<artifactId>jmx</artifactId>
-				<version>${jmx-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.jmx</groupId>
-				<artifactId>jmxremote</artifactId>
-				<version>${jmx-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.jmx</groupId>
-				<artifactId>jmxremote_optional</artifactId>
-				<version>${jmx-version}</version>
-			</dependency>
+			<!-- <dependency> <groupId>com.jmx</groupId> <artifactId>jmx</artifactId> 
+				<version>${jmx-version}</version> </dependency> <dependency> <groupId>com.jmx</groupId> 
+				<artifactId>jmxremote</artifactId> <version>${jmx-version}</version> </dependency> 
+				<dependency> <groupId>com.jmx</groupId> <artifactId>jmxremote_optional</artifactId> 
+				<version>${jmx-version}</version> </dependency> -->
 
 			<dependency>
 				<groupId>com.caucho</groupId>
@@ -860,14 +849,16 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-    <distributionManagement>
-		<repository>		
-			<id>releases</id>
-			<url>http://maven.ziroom.com:8081/nexus/content/repositories/releases</url>
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>ziroom-releases</name>
+			<url>http://mvn.ziroom.com/sojourn-release</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
-			<url>http://maven.ziroom.com:8081/nexus/content/repositories/snapshots</url>
+			<name>ziroom-snapshots</name>
+			<url>http://mvn.ziroom.com/sojourn-release</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
