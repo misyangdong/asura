@@ -53,7 +53,7 @@
 			<artifactId>zkclient</artifactId>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.jmx</groupId>
 			<artifactId>jmx</artifactId>
 		</dependency>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.jmx</groupId>
 			<artifactId>jmxremote_optional</artifactId>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 
